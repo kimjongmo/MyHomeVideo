@@ -8,11 +8,6 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class PageController {
 
-    @GetMapping("mobile")
-    public String mobileHello() {
-        return "helloMobile";
-    }
-
     @GetMapping("pc")
     public String hello() {
         return "hello";

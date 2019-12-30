@@ -20,13 +20,16 @@
 <script>
     var $ = jQuery.noConflict();
     $(document).ready(function () {
-        $.get('http://localhost:9090/video/list',function (data, status) {
-            console.log(status);
-            var content = '';
-            for(var i=0;i<data.length;i++){
-                content += '<li><a href="http://localhost:9090/video/'+i+'">'+data[i]+'</a></li>'
+        $.ajax({
+            url: '/video/list',
+            context: document.body,
+            success: function (data) {
+                var content = '';
+                for (var i = 0; i < data.length; i++) {
+                    content += '<li><a href="/video/' + i + '">' + data[i] + '</a></li>'
+                }
+                $('#list').html(content);
             }
-            $('#list').html(content);
         });
     });
 </script>
