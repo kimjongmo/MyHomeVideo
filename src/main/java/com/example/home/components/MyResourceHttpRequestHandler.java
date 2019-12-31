@@ -16,5 +16,8 @@ public class MyResourceHttpRequestHandler  extends ResourceHttpRequestHandler {
     protected Resource getResource(HttpServletRequest request) throws IOException {
         final File file = (File)request.getAttribute("file");
         return new FileSystemResource(file);
+
     }
+
+
 }

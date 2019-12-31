@@ -8,6 +8,11 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class PageController {
 
+    @GetMapping("/")
+    public String index(){
+        return "index";
+    }
+
     @GetMapping("pc")
     public String hello() {
         return "hello";
