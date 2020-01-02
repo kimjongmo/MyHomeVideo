@@ -7,13 +7,13 @@ import com.example.home.model.network.Header;
 import com.example.home.model.network.request.VideoListRequest;
 import com.example.home.model.network.response.VideoListResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,14 +37,14 @@ public class VideoService {
 
     public Header<List<VideoListResponse>> getList(VideoListRequest videoListRequest) {
         String category = videoListRequest.getCategory();
-        List<String> fileNameList = videoUtils.getList(category);
-        List<VideoListResponse> body = fileNameList.stream().map((fileName) -> {
-            String pureFileName = fileName.substring(0, fileName.lastIndexOf("."));
-            File videoFile = videoUtils.getFile(category, fileName);
-            File creatingImageFile = new File(thumbnailGenerator.getThumbnailPath() + "\\" + pureFileName + ".jpg");
-            thumbnailGenerator.extractImage(videoFile, 60, creatingImageFile);
-            return makeResponse(fileName);
-        }).collect(Collectors.toList());
+        List<File> fileList = videoUtils.getFileList(category);
+        List<VideoListResponse> body = fileList.stream()
+                .map((file) -> {
+                    String pureFileName = videoUtils.getPureFileName(file);
+                    File creatingImageFile = new File(thumbnailGenerator.getThumbnailPath() + "\\" + pureFileName + ".jpg");
+                    thumbnailGenerator.extractImage(file, 60, creatingImageFile);
+                    return makeResponse(file.getName());
+                }).collect(Collectors.toList());
         return Header.OK(body);
     }
 

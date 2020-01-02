@@ -38,7 +38,7 @@ function loadVideoData(category) {
     });
 }
 function playVideo(fileName){
-    window.location.href="/video/"+categories.currentCategory+"/"+fileName;
+    window.location.href="/player/"+categories.currentCategory+"/"+fileName;
 }
 
 $(document).ready(function () {

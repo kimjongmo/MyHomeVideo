@@ -2,12 +2,31 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Video Service For my home.">
+    <meta name="author" content="Jong mo Kim">
     <title>즐거운 감상하세요.</title>
+    <!-- Bootstrap core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        h1 {
+            width: 100%;;
+            height: auto;
+        }
+        video {
+            width: 100%;
+            height: auto;
+        }
+    </style>
 </head>
 <body>
 <h1>즐거운 감상하세요.</h1>
+
+</div>
 <video width="1000" height="400" controls>
-    <source th:src="${videoPath}" type="video/mp4">
+    <source th:src="'/video/'+${category}+'/'+${fileName}" type="video/mp4">
 </video>
+<br>
+<a href="javascript:void(0);" onclick="history.back();" class="btn btn-block btn-success">뒤로가기</a>
 </body>
 </html>

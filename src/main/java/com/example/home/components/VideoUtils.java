@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.List;
@@ -29,21 +29,38 @@ public class VideoUtils {
         }
     }
 
-    public List<String> getList(String category) {
+    // 파일 형식 && mp4 확장자만 필터링
+    public List<File> getFileList(String category) {
         String path = HOME_PATH + "\\" + category;
         log.info("search path : {}", path);
         File file = new File(path);
-        // TODO: 2019-12-31 만약 폴더가 없다면 에러 발생시키기.
+
         if(!file.exists())
             throw new CategoryNotFoundException(category);
-        return Arrays.asList(file.list());
+        return Arrays.asList(file.listFiles(pathname -> {
+            if(pathname.isFile() && getFileExt(pathname).equals("mp4"))
+                return true;
+            return false;
+        }));
     }
 
-    public File getFile(String category, String fileName) {
+    public File getFile(String category, String fileName) throws FileNotFoundException {
         String filePath = HOME_PATH + "\\" + category + "\\" + fileName;
         File file = new File(filePath);
-        // TODO: 2019-12-31 만약 파일이 없다면 에러 발생시키기.
+        if(!file.exists())
+            throw new FileNotFoundException();
         return file;
     }
+
+    public String getPureFileName(File file){
+        String name = file.getName();
+        return name.substring(0, name.lastIndexOf("."));
+    }
+
+    public String getFileExt(File file){
+        String name = file.getName();
+        return name.substring(name.lastIndexOf('.')+1);
+    }
+
 
 }
