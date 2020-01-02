@@ -6,6 +6,7 @@ import com.example.home.model.network.Header;
 import com.example.home.model.network.request.VideoListRequest;
 import com.example.home.model.network.response.VideoListResponse;
 import com.example.home.service.VideoService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +19,7 @@ import java.util.List;
 
 @RestController
 @CrossOrigin
+@Slf4j
 @RequestMapping("/video")
 public class VideoController {
 
@@ -26,6 +28,7 @@ public class VideoController {
 
     @GetMapping
     public Header<List<VideoListResponse>> list(@Valid VideoListRequest videoListRequest) {
+        log.info("category = {}, page={}",videoListRequest.getCategory(),videoListRequest.getPage());
         return videoService.getList(videoListRequest);
     }
 

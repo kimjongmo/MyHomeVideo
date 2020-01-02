@@ -50,20 +50,24 @@
         <div id="category-list" class="col-lg-3">
             <h1 class="my-4">Video Category</h1>
             <div class="list-group" v-for="category in categories">
-                <a href="javascript:void(0);" @click="selectCategory(category);" class="list-group-item">{{category}}</a>
+                <a href="javascript:void(0);" @click="selectCategory(category);"
+                   class="list-group-item">{{category}}</a>
             </div>
             현재 선택한 카테고리 : <span>{{currentCategory}}</span>
         </div>
         <!-- /.col-lg-3 -->
-
         <div class="col-lg-9">
+            <div class="row" style="border: 1px solid red;">
+                <h1>영상 컨텐츠 리스트</h1>
+            </div>
             <div id="contentList" class="row">
                 <h1 v-if="videos.length === 0">
                     좌측에서 카테고리를 선택해주세요.
                 </h1>
                 <div class="col-lg-4 col-md-6 mb-4" v-for="video in videos">
                     <div class="card h-100">
-                        <a href="javascript:void(0);" @click="move(video.name);"><img class="card-img-top" :src="video.thumbnail_url" alt=""></a>
+                        <a href="javascript:void(0);" @click="move(video.name);"><img class="card-img-top"
+                                                                                      :src="video.thumbnail_url" alt=""></a>
                         <div class="card-body">
                             <h4 class="card-title">
                                 <a href="javascript:void(0);" @click="move(video.name);">{{video.name}}</a>
@@ -74,6 +78,11 @@
                             <small class="text-muted">&#9733; &#9733; &#9733; &#9733; &#9734;</small>
                         </div>
                     </div>
+                </div>
+                <div v-if="isContentEnd">
+                    <h1 v-if="isContentEnd">
+                        더 이상 영상이 없습니다.
+                    </h1>
                 </div>
             </div>
             <!-- /.row -->

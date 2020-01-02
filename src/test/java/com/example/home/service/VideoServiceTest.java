@@ -34,6 +34,7 @@ public class VideoServiceTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         videoService = new VideoService(videoUtils, thumbnailGenerator,handler);
+        thumbnailGenerator.setThumbnailPath("C:\\Users\\KIM\\Desktop\\HomePlayer\\src\\main\\resources\\static\\img\\thumbnail");
     }
 
     @Test
@@ -48,7 +49,6 @@ public class VideoServiceTest {
     @Test
     public void getListTest() {
 
-        thumbnailGenerator.setThumbnailPath("C:\\Users\\KIM\\Desktop\\HomePlayer\\src\\main\\resources\\static\\img\\thumbnail");
         List<File> fileNameList = new ArrayList<>();
 
         for (int i = 0; i < 10; i++)
@@ -65,8 +65,7 @@ public class VideoServiceTest {
     }
 
     @Test
-    public void getListTestWithNotExistedCategory() {
-
+    public void pageTest() {
     }
 
 }

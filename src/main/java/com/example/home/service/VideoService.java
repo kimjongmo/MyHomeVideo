@@ -37,7 +37,9 @@ public class VideoService {
 
     public Header<List<VideoListResponse>> getList(VideoListRequest videoListRequest) {
         String category = videoListRequest.getCategory();
-        List<File> fileList = videoUtils.getFileList(category);
+        Integer count = videoListRequest.getPage();
+
+        List<File> fileList = videoUtils.getFileList(category,count);
         List<VideoListResponse> body = fileList.stream()
                 .map((file) -> {
                     String pureFileName = videoUtils.getPureFileName(file);

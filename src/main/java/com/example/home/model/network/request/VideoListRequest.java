@@ -3,6 +3,7 @@ package com.example.home.model.network.request;
 import lombok.*;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
@@ -13,4 +14,6 @@ import javax.validation.constraints.NotEmpty;
 public class VideoListRequest {
     @NotEmpty
     private String category;
+    @NotNull
+    private Integer page;
 }
