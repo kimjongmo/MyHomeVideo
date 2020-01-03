@@ -64,6 +64,16 @@ function playVideo(fileName) {
     window.location.href = "/player/" + categories.currentCategory + "/" + fileName;
 }
 
+function infiniteScroll() {
+    if ($(document).height() - 30 <= $(window).height() + $(window).scrollTop()) {
+        $(window).off('scroll');
+        contentList.addData();
+        setTimeout(function () {
+            $(window).scroll(infiniteScroll);
+        },500);
+    }
+}
+
 $(document).ready(function () {
     $.ajax({
         url: '/category',
@@ -75,10 +85,6 @@ $(document).ready(function () {
         }
     });
 
-    $(window).scroll(function () {
-        if ($(document).height() - 30 <= $(window).height() + $(window).scrollTop()) {
-            contentList.addData();
-        }
-    });
+    $(window).scroll(infiniteScroll);
 });
 

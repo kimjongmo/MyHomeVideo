@@ -28,7 +28,7 @@ public class PageApiController {
 
     @GetMapping("/category")
     public Header<List<String>> getCategory(){
-        log.info("[category]");
+        log.info("[/category]");
         return pageApiService.getCategoryList();
     }
 
