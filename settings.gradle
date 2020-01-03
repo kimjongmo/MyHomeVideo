@@ -1,1 +1,5 @@
-rootProject.name = 'home'
+rootProject.name = 'demo'
+include 'video-api'
+include 'common'
+include 'front'
+

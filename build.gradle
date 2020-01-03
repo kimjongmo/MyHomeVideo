@@ -1,21 +1,60 @@
-plugins {
-    id 'org.springframework.boot' version '2.1.6.RELEASE'
-    id 'io.spring.dependency-management' version '1.0.8.RELEASE'
-    id 'java'
+buildscript {
+    ext {
+        springBootVersion = '2.1.11.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath "io.spring.gradle:dependency-management-plugin:0.6.0.RELEASE"
+    }
 }
 
-group = 'com.example'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '1.8'
+subprojects {
+    group 'com.myhome.play'
+    version '1.0-SNAPSHOT'
 
-repositories {
-    mavenCentral()
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    sourceCompatibility = 1.8
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter-web:2.1.6.RELEASE'
+        compileOnly 'org.projectlombok:lombok:1.18.10'
+        annotationProcessor 'org.projectlombok:lombok:1.18.10'
+        testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.1.6.RELEASE'
+    }
+}
+project(':common'){
+    jar {
+        enabled = true
+    }
+
+    bootJar {
+        enabled = false
+    }
+
+    dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+        implementation 'com.h2database:h2'
+    }
+}
+project(':video-api'){
+    dependencies {
+        compile project(':common')
+    }
 }
 
-dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:2.1.6.RELEASE'
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.1.6.RELEASE'
-    compileOnly 'org.projectlombok:lombok:1.18.10'
-    annotationProcessor 'org.projectlombok:lombok:1.18.10'
-    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.1.6.RELEASE'
+project(':front'){
+    dependencies {
+        compile project(':common')
+        implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:2.1.6.RELEASE'
+    }
 }

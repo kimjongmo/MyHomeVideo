@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: jdbc:h2:~/data/myhome
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+  h2:
+    console:
+      enabled: true
+
+---
+spring:
+  profiles: test
+  datasource:
+    url: jdbc:h2:~/data/myhome
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
