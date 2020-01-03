@@ -29,7 +29,7 @@ var contentList = new Vue({
 
             this.page += 1;
             $.ajax({
-                url: "http://localhost:9090/video?category=" + categories.currentCategory + "&page=" + this.page,
+                url: "/contents?category=" + categories.currentCategory + "&page=" + this.page,
                 type: "GET",
                 contentType: "application/json",
                 success: function (data) {
@@ -49,7 +49,7 @@ var contentList = new Vue({
 
 function loadVideoData(category) {
     $.ajax({
-        url: "http://localhost:9090/video?category=" + category + "&page=0",
+        url: "/contents?category=" + category + "&page=0",
         type: "GET",
         contentType: "application/json",
         success: function (data) {
@@ -66,7 +66,7 @@ function playVideo(fileName) {
 
 $(document).ready(function () {
     $.ajax({
-        url: 'http://localhost:9090/category',
+        url: '/category',
         type: 'GET',
         contentType: 'application/json',
         success: function (data) {

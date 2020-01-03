@@ -1,5 +1,6 @@
 package com.myhome.play.model.network.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 @Getter
@@ -9,6 +10,8 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class VideoListResponse {
+    @JsonProperty("name")
     private String name;
+    @JsonProperty("thumbnail_url")
     private String thumbnailUrl;
 }

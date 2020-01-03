@@ -1,2 +1,12 @@
 server:
   port: 8080
+
+spring:
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+
+video:
+  server:
+    api: http://localhost:9090
+
+
