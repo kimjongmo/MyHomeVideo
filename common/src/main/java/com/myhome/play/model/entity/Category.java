@@ -6,19 +6,14 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @ToString(exclude = {"videoList"})
-public class Category {
+public class Category extends BaseEntity{
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
     private String name;
-
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     private List<Video> videoList;
 }

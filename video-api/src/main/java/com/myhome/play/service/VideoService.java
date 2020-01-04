@@ -42,9 +42,9 @@ public class VideoService {
         List<VideoListResponse> body = fileList.stream()
                 .map((file) -> {
                     // TODO: 2020-01-03 썸네일 생성은 다른 모듈에서 실행하는게 좋을 것 같은데..
-//                    String pureFileName = videoUtils.getPureFileName(file);
-//                    File creatingImageFile = new File(thumbnailGenerator.getThumbnailPath() + "\\" + pureFileName + ".jpg");
-//                    thumbnailGenerator.extractImage(file, 60, creatingImageFile);
+                    String pureFileName = videoUtils.getPureFileName(file);
+                    File creatingImageFile = new File(thumbnailGenerator.getThumbnailPath() + "\\" + pureFileName + ".jpg");
+                    thumbnailGenerator.extractImage(file, 60, creatingImageFile);
                     return makeResponse(file.getName());
                 }).collect(Collectors.toList());
         return Header.OK(body);

@@ -10,4 +10,4 @@ home:
 ffmpeg:
   path: C:\\Users\\KIM\\Desktop\\ffmpeg-20191229-e20c6d9-win64-static\\ffmpeg-20191229-e20c6d9-win64-static\\bin
 thumbnail:
-  path: C:\\Users\\KIM\\Desktop\\HomePlayer\\src\\main\\resources\\static\\img\\thumbnail
+  path: C:\\Users\\KIM\\Desktop\\HomePlayer\\front\\src\\main\\resources\\static\\img\\thumbnail
