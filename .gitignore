@@ -172,4 +172,4 @@ gradle-app.setting
 
 ### APPLICATION ###
 
-#**/resources/static/img/thumbnail/**
+**/resources/static/img/thumbnail/**

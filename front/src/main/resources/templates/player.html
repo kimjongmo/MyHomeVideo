@@ -21,10 +21,9 @@
 </head>
 <body>
 <h1>즐거운 감상하세요.</h1>
-
 </div>
 <video width="1000" height="400" controls>
-    <source th:src="'http://localhost:9090/video/'+${category}+'/'+${fileName}" type="video/mp4">
+    <source th:src="${server}+'/video/'+${category}+'/'+${fileName}" type="video/mp4">
 </video>
 <br>
 <a href="javascript:void(0);" onclick="history.back();" class="btn btn-block btn-success">뒤로가기</a>
