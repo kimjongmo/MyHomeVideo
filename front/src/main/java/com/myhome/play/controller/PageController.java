@@ -19,6 +19,11 @@ public class PageController {
         return new ModelAndView("index");
     }
 
+    @GetMapping("/{category}")
+    public ModelAndView index2(@PathVariable String category){
+        return new ModelAndView("index");
+    }
+
     @GetMapping("/player/{category}/{fileName}")
     public ModelAndView play(HttpServletRequest request,
                              @PathVariable String category,

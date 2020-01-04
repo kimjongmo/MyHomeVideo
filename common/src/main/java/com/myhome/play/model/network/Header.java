@@ -20,4 +20,10 @@ public class Header<T> {
                 .data(body)
                 .build();
     }
+
+    public static Header NOT_FOUND(){
+        return Header.builder()
+                .status("NOT_FOUND")
+                .build();
+    }
 }

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org/">
+
+<div id="category-list" class="col-lg-3" th:fragment="category">
+    <h1 class="my-4">Video Category</h1>
+    <div class="dropdown">
+        <button  type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+            {{currentCategory==''?"카테고리 선택":currentCategory}}
+        </button>
+        <div class="dropdown-menu">
+            <a v-for="category in categories"
+               href="javascript:void(0);"
+               @click="selectCategory(category);"
+               class="dropdown-item">{{category}}</a>
+        </div>
+    </div>
+</div>
+</html>

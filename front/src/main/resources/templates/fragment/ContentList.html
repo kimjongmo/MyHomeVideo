@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org/">
+
+<div id="contentList" th:fragment="content-list">
+    <div class="row">
+        <h1 v-if="videos.length === 0">
+            좌측에서 카테고리를 선택해주세요.
+        </h1>
+        <div class="col-lg-4 col-md-6 mb-4" v-for="video in videos">
+            <div class="card h-100">
+                <a href="javascript:void(0);" @click="move(video.name);"><img class="card-img-top"
+                                                                              :src="video.thumbnail_url"
+                                                                              alt=""></a>
+                <div class="card-body">
+                    <h4 class="card-title">
+                        <a href="javascript:void(0);" @click="move(video.name);">{{video.name}}</a>
+                    </h4>
+                    <p class="card-text">{{video.name}}</p>
+                </div>
+                <div class="card-footer">
+                    <small class="text-muted">&#9733; &#9733; &#9733; &#9733; &#9734;</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" v-if="isContentEnd">
+        <h1 class="display-3" style="background-color: #5a6268; color: white;" v-if="isContentEnd">
+            더 이상 영상이 없습니다.
+        </h1>
+    </div>
+</div>
+</html>

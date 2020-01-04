@@ -8,10 +8,13 @@ var categories = new Vue({
     },
     methods: {
         selectCategory: function (category) {
-            this.currentCategory = category;
+            location.href='/'+category;
+        },
+        loadData: function (category) {
+            categories.currentCategory = category;
             loadVideoData(category);
         }
-    }
+    },
 });
 
 var contentList = new Vue({
@@ -53,6 +56,10 @@ function loadVideoData(category) {
         type: "GET",
         contentType: "application/json",
         success: function (data) {
+            if(data.status==='NOT_FOUND'){
+                alert('알수없는 카테고리입니다.');
+                return;
+            }
             contentList.videos = data.data;
             contentList.page = 0;
             contentList.isContentEnd = false;
@@ -82,6 +89,9 @@ $(document).ready(function () {
         success: function (data) {
             console.log(data.status);
             categories.categories = data.data;
+            var selected = decodeURI(location.pathname.split('/')[1]);
+            if(selected !== '')
+                categories.loadData(selected);
         }
     });
 
