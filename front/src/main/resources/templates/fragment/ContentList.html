@@ -10,17 +10,17 @@
         </h1>
         <div class="col-lg-4 col-md-6 mb-4" v-for="video in videos">
             <div class="card h-100">
-                <a href="javascript:void(0);" @click="move(video.name);"><img class="card-img-top"
+                <a href="javascript:void(0);" @click="move(video.id);"><img class="card-img-top"
                                                                               :src="video.thumbnail_url"
                                                                               alt=""></a>
                 <div class="card-body">
                     <h4 class="card-title">
-                        <a href="javascript:void(0);" @click="move(video.name);">{{video.name}}</a>
+                        <a href="javascript:void(0);" @click="move(video.id);">{{video.title}}</a>
                     </h4>
-                    <p class="card-text">{{video.name}}</p>
+                    <p class="card-text">{{video.description}}</p>
                 </div>
                 <div class="card-footer">
-                    <small class="text-muted">&#9733; &#9733; &#9733; &#9733; &#9734;</small>
+                    <small class="text-muted">조회수 : {{video.view}}</small>
                 </div>
             </div>
         </div>

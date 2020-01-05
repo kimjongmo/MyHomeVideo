@@ -1,12 +1,16 @@
 package com.myhome.play.controller;
 
+import com.myhome.play.model.entity.Category;
 import com.myhome.play.model.network.Header;
+import com.myhome.play.model.network.request.category.CategoryInsertRequest;
 import com.myhome.play.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 @RestController
@@ -16,7 +20,14 @@ public class CategoryController {
     private CategoryService categoryService;
 
     @GetMapping("/category")
-   public Header<List<String>> getList(){
-       return Header.OK(categoryService.getCategoryList());
-   }
+    public Header<List<String>> getList() {
+        return Header.OK(categoryService.getCategoryList());
+    }
+
+    @PostMapping("/category")
+    public ResponseEntity insert(@RequestBody @Valid CategoryInsertRequest request) throws URISyntaxException {
+        Category category = categoryService.insert(request);
+        String uri = "/category/" +category.getId();
+        return ResponseEntity.created(new URI(uri)).body("");
+    }
 }

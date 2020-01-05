@@ -44,8 +44,8 @@ var contentList = new Vue({
                 }
             });
         },
-        move: function (fileName) {
-            playVideo(fileName);
+        move: function (id) {
+            playVideo(id);
         },
     }
 });
@@ -67,10 +67,11 @@ function loadVideoData(category) {
     });
 }
 
-function playVideo(fileName) {
-    window.location.href = "/player/" + categories.currentCategory + "/" + fileName;
+function playVideo(id) {
+    window.location.href = "/player/"+ id;
 }
 
+//TODO 화면이 너무 크다보면 스크롤이 안생기는 경우 생김
 function infiniteScroll() {
     if ($(document).height() - 30 <= $(window).height() + $(window).scrollTop()) {
         $(window).off('scroll');

@@ -10,8 +10,14 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class VideoListResponse {
-    @JsonProperty("name")
-    private String name;
+    @JsonProperty("id")
+    private Long id;
+    @JsonProperty("title")
+    private String title;
     @JsonProperty("thumbnail_url")
     private String thumbnailUrl;
+    @JsonProperty("view")
+    private Long view;
+    @JsonProperty("description")
+    private String description;
 }

@@ -1,9 +1,22 @@
-server:
-  port: 9090
 
 spring:
+  ## JPA ##
+  jpa:
+    hibernate:
+      ddl-auto: update
+  ## DATASOURCE ##
+  datasource:
+    url: jdbc:h2:~/data/video;
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  ## JSON ##
   jackson:
     property-naming-strategy: SNAKE_CASE
+  ## H2-CONSOLE ##
+  h2:
+    console:
+      enabled: true
 
 home:
   path: D:\\MyHomeVideo
@@ -11,3 +24,5 @@ ffmpeg:
   path: C:\\Users\\KIM\\Desktop\\ffmpeg-20191229-e20c6d9-win64-static\\ffmpeg-20191229-e20c6d9-win64-static\\bin
 thumbnail:
   path: C:\\Users\\KIM\\Desktop\\HomePlayer\\front\\src\\main\\resources\\static\\img\\thumbnail
+server:
+  port: 9090
