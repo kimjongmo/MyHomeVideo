@@ -4,15 +4,12 @@ import com.myhome.play.model.entity.Video;
 import com.myhome.play.repo.VideoRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
 
 @Controller
@@ -34,12 +31,15 @@ public class PageController {
 
     @GetMapping("/player/{id}")
     public ModelAndView play(HttpServletRequest request, @PathVariable Long id) {
-
+        log.info("[/player/{}]",id);
         Optional<Video> optionalVideo = videoRepository.findById(id);
+        log.info("{}",optionalVideo.get());
         if(optionalVideo.isPresent()){
             Video video = optionalVideo.get();
-            video.setViews(video.getViews()+1);
-            videoRepository.save(video);
+            Long views = video.getViews()+1;
+            video.setViews(views);
+            Video saved = videoRepository.save(video);
+            log.info("views = {}",saved.getViews());
         }
 
         ModelAndView view = new ModelAndView("player");

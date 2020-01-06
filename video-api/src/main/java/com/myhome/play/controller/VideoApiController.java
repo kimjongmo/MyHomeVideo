@@ -56,7 +56,4 @@ public class VideoApiController {
     }
 
 
-    // TODO: 2020-01-04 파일 업로드
-
-
 }

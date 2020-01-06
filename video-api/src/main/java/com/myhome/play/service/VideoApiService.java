@@ -62,17 +62,12 @@ public class VideoApiService {
 
     public void play(HttpServletRequest req, HttpServletResponse res, Long id) throws ServletException, IOException {
         Optional<Video> optionalVideo = videoRepository.findById(id);
-
         if (!optionalVideo.isPresent()) {
             PrintWriter writer = res.getWriter();
             writer.print("<script>alert('존재하지 않는 비디오입니다');history.back();</script>");
             writer.flush();
         }
-
-        // TODO: 2020-01-04 조회수를 올리는 부분은 다시 한번 생각해봐야 할 듯..
         Video video = optionalVideo.get();
-        video.setViews(video.getViews()+1);
-        videoRepository.save(video);
 
         File file = new File(HOME_PATH + "/" + video.getCategory().getDirectoryPath() + "/" + video.getFileName());
         req.setAttribute("file", file);
