@@ -12,8 +12,8 @@
         <div class="dropdown-menu">
             <a v-for="category in categories"
                href="javascript:void(0);"
-               @click="selectCategory(category);"
-               class="dropdown-item">{{category}}</a>
+               @click="selectCategory(category.name);"
+               class="dropdown-item">{{category.name}}</a>
         </div>
     </div>
 </div>

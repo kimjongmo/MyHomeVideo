@@ -88,7 +88,10 @@ $(document).ready(function () {
         type: 'GET',
         contentType: 'application/json',
         success: function (data) {
-            console.log(data.status);
+            if(data.status === 'ERROR'){
+                alert(data.description);
+                return;
+            }
             categories.categories = data.data;
             var selected = decodeURI(location.pathname.split('/')[1]);
             if(selected !== '')

@@ -3,6 +3,7 @@ package com.myhome.play.controller;
 import com.myhome.play.model.entity.Category;
 import com.myhome.play.model.network.Header;
 import com.myhome.play.model.network.request.category.CategoryInsertRequest;
+import com.myhome.play.model.network.response.category.CategoryListResponse;
 import com.myhome.play.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class CategoryController {
     private CategoryService categoryService;
 
     @GetMapping("/category")
-    public Header<List<String>> getList() {
+    public Header<List<CategoryListResponse>> getList() {
         return Header.OK(categoryService.getCategoryList());
     }
 

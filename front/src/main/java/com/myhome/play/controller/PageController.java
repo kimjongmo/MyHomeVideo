@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Optional;
 
 @Controller
@@ -25,34 +28,44 @@ public class PageController {
     }
 
     @GetMapping("/{category}")
-    public ModelAndView index2(@PathVariable String category){
+    public ModelAndView index2(@PathVariable String category) {
         return new ModelAndView("index");
     }
 
     @GetMapping("/player/{id}")
-    public ModelAndView play(HttpServletRequest request, @PathVariable Long id) {
-        log.info("[/player/{}]",id);
+    public ModelAndView play(HttpServletRequest request, HttpServletResponse response, @PathVariable Long id) throws IOException {
+        log.info("[/player/{}]", id);
+
         Optional<Video> optionalVideo = videoRepository.findById(id);
-        log.info("{}",optionalVideo.get());
-        if(optionalVideo.isPresent()){
-            Video video = optionalVideo.get();
-            Long views = video.getViews()+1;
-            video.setViews(views);
-            Video saved = videoRepository.save(video);
-            log.info("views = {}",saved.getViews());
+
+        if (!optionalVideo.isPresent()) {
+            makePage(response);
+            return null;
         }
 
+        addViewCount(optionalVideo.get());
+
         ModelAndView view = new ModelAndView("player");
-        // TODO: 2020-01-04 나중에 리팩토링 할 것.
-        String host = "http://"+request.getHeader("Host").split(":")[0];
-        log.info("host = {}",host);
-        view.addObject("server",host+":9090");
+        String host = "http://" + request.getHeader("Host").split(":")[0];
+        view.addObject("server", host + ":9090");
         view.addObject("id", id);
         return view;
     }
 
     @GetMapping("/register")
-    public ModelAndView register(){
+    public ModelAndView register() {
         return new ModelAndView("register");
+    }
+
+    private void makePage(HttpServletResponse response) throws IOException {
+        PrintWriter writer = response.getWriter();
+        writer.print("<script>alert('Sorry Not Existed Video...');history.back();</script>");
+        writer.flush();
+    }
+
+    private void addViewCount(Video video) {
+        Long views = video.getViews() + 1;
+        video.setViews(views);
+        Video saved = videoRepository.save(video);
     }
 }

@@ -4,15 +4,39 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <!--    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">-->
     <link href="css/bootstrap.min.css" rel="stylesheet">
-    <script src="js/bootstrap.bundle.min.js"></script>
-    <script src="js/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="http://malsup.github.com/jquery.form.js"></script>
     <title>등록 페이지</title>
+    <style>
+        .progress {
+            margin-top: 20px;
+            position: relative;
+            width: 100%;
+            border: 1px solid #ddd;
+            padding: 1px;
+            border-radius: 3px;
+            height: 2rem;
+        }
+
+        .bar {
+            background-color: #B4F5B4;
+            width: 0%;
+            height: 20px;
+            border-radius: 3px;
+        }
+
+        .percent {
+            position: absolute;
+            display: inline-block;
+            top: 3px;
+            left: 48%;
+        }
+    </style>
 </head>
 <body>
 <div class="container">
-    <form class="form-horizontal" role="form">
+    <form class="form-horizontal" role="form" enctype="multipart/form-data" method="post">
         <div class="row">
             <div class="col-md-3"></div>
             <div class="col-md-6">
@@ -27,7 +51,7 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <div class="dropdown">
-                        <select id="category_name" class="custom-select custom-select-sm">
+                        <select id="category_name" name="category_id" class="custom-select custom-select-sm">
                         </select>
                     </div>
                 </div>
@@ -43,14 +67,16 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <div class="input-group mb-2 mr-sm-2 mb-sm-0">
-                        <!--                        <input type="text" name="file_name" class="form-control" id="file_name"-->
-                        <!--                               placeholder="동영상_제목.mp4" required autofocus>-->
-                        <input type="file" name="file_name" accept=".mp4" class="form-control" id="file_name"
-                               placeholder="동영상_제목.mp4" required autofocus>
+                        <input type="file" name="file" accept=".mp4" class="form-control" id="file_name"
+                               placeholder="동영상_제목.mp4">
                     </div>
                 </div>
             </div>
+            <div class="col-md-3">
+                <input id="addFile" type="button" class="btn btn-danger" value="파일 추가">
+            </div>
         </div>
+        <div id="file-list"></div>
         <div class="row">
             <div class="col-md-3 field-label-responsive">
                 <label for="title">제목</label>
@@ -71,8 +97,18 @@
             </div>
         </div>
     </form>
+    <div class="progress">
+        <div class="bar"></div>
+        <div class="percent">0%</div>
+    </div>
 </div>
 <script>
+
+
+    function removeDiv(fileNumber) {
+        $('#file' + fileNumber).remove();
+    }
+
     function categoryLoad() {
         $.ajax({
             url: '/category',
@@ -82,32 +118,30 @@
                 let content = '';
                 let categories = data.data;
                 for (let i = 0; i < categories.length; i++)
-                    content += '<option>' + categories[i] + '</option>';
+                    content += '<option value="' + categories[i].id + '">' + categories[i].name + '</option>';
                 $('#category_name').html(content);
             }
         });
     }
 
     $(document).ready(function () {
-        $('#regBtn').click(function () {
-            let data = {
-                file_name: $('#file_name').prop('files')[0].name,
-                title: $('#title').val(),
-                category_name: $('#category_name').val()
-            }
-
-            $.ajax({
-                url: '/video',
-                type: 'POST',
-                data: JSON.stringify(data),
-                contentType: 'application/json',
-                success: function (data) {
-                    alert(data.status);
-                    location.reload();
-                }
-            });
+        var fileCnt = 1;
+        $('#addFile').click(function () {
+            var add = '<div class="row" id="file' + fileCnt + '"> ' +
+                '   <div class="col-md-3"></div> ' +
+                '   <div class="col-md-6">' +
+                '       <div class="form-group">' +
+                '           <div class="input-group mb-2 mr-sm-2 mb-sm-0">' +
+                '               <input type="file" name="file" accept=".mp4" class="form-control" placeholder="동영상_제목.mp4">' +
+                '           </div> ' +
+                '       </div> ' +
+                '   </div> ' +
+                '   <div class="col-md-3">' +
+                '       <input type="button" class="btn btn-primary" onclick="removeDiv(' + fileCnt + ')" value="지우기">' +
+                '   </div>' +
+                '</div>';
+            $('#file-list').append(add);
         });
-
         $('#newCategory').click(function () {
             let name = prompt("추가할 카테고리 명을 입력하세요.", '');
             if (name !== '') {
@@ -126,7 +160,39 @@
         });
 
         categoryLoad();
+
+        var bar = $('.bar');
+        var percent = $('.percent');
+
+        $('#regBtn').click(function () {
+            $('form').attr("action",'http://' + location.hostname + ':9090/upload');
+            $('form').submit();
+        });
+
+        $('form').ajaxForm({
+            // 전송 전
+            beforeSend: function () {
+                var percentVal = '0%';
+                bar.width(percentVal);
+                percent.html(percentVal);
+            },
+            // 업로드 시
+            uploadProgress: function (event, position, total, percentComplete) {
+                var percentVal = percentComplete + '%';
+                bar.width(percentVal);
+                percent.html(percentVal);
+            },
+            // // 완료 시
+            complete: function (xhr) {
+                alert(xhr.responseText);
+                window.location.reload();
+            }
+        });
+
     });
+
+
 </script>
+
 </body>
 </html>

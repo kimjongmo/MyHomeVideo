@@ -13,6 +13,7 @@ public class Header<T> {
 
     private String status;
     private T data;
+    private String description;
 
     public static <T> Header<T> OK(T body) {
         return (Header<T>) Header.builder()
@@ -24,6 +25,13 @@ public class Header<T> {
     public static Header NOT_FOUND(){
         return Header.builder()
                 .status("NOT_FOUND")
+                .build();
+    }
+
+    public static Header ERROR(String description){
+        return Header.builder()
+                .status("ERROR")
+                .description(description)
                 .build();
     }
 }

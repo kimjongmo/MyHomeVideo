@@ -1,5 +1,8 @@
-
 spring:
+  servlet:
+    multipart:
+      max-file-size: -1
+      max-request-size: -1
   ## JPA ##
   jpa:
     hibernate:
@@ -17,6 +20,7 @@ spring:
   h2:
     console:
       enabled: true
+
 
 home:
   path: D:\\MyHomeVideo

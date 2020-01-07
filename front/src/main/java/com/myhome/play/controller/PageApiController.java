@@ -3,6 +3,7 @@ package com.myhome.play.controller;
 import com.myhome.play.model.network.Header;
 import com.myhome.play.model.network.request.VideoListRequest;
 import com.myhome.play.model.network.response.VideoListResponse;
+import com.myhome.play.model.network.response.category.CategoryListResponse;
 import com.myhome.play.service.PageApiService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ public class PageApiController {
     }
 
     @GetMapping("/category")
-    public Header<List<String>> getCategory(){
+    public Header<List<CategoryListResponse>> getCategory(){
         log.info("[/category]");
         return pageApiService.getCategoryList();
     }

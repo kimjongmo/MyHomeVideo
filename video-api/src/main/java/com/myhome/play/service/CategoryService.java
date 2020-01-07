@@ -1,8 +1,10 @@
 package com.myhome.play.service;
 
+import com.myhome.play.exceptions.CategoryDuplicateException;
 import com.myhome.play.exceptions.CategoryNotFoundException;
 import com.myhome.play.model.entity.Category;
 import com.myhome.play.model.network.request.category.CategoryInsertRequest;
+import com.myhome.play.model.network.response.category.CategoryListResponse;
 import com.myhome.play.repo.CategoryRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,15 +25,20 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
-    public List<String> getCategoryList() {
+    public List<CategoryListResponse> getCategoryList() {
         List<Category> categoryList = categoryRepository.findAll();
-        return categoryList.stream().map(category -> category.getName()).collect(Collectors.toList());
+        return categoryList.stream().map(category ->
+            CategoryListResponse.builder().name(category.getName()).id(category.getId()).build()
+        ).collect(Collectors.toList());
     }
 
     public Category insert(CategoryInsertRequest request) {
         File file = new File(HOME_PATH + "/" + request.getName());
-        if (!file.exists())
-            file.mkdir();
+
+        if (file.exists())
+            throw new CategoryDuplicateException(request.getName());
+
+        file.mkdir();
         return categoryRepository.save(Category.builder()
                         .name(request.getName())
                         .directoryPath(request.getName())

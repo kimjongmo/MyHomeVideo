@@ -24,7 +24,7 @@ public class RestTemplateService {
                 .method(httpMethod, uri)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .body(requestData);
-        ResponseEntity<T> response = restTemplate.exchange(request,type);
+        ResponseEntity<T> response = restTemplate.exchange(request, type);
         return response.getBody();
     }
 
