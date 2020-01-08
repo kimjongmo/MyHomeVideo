@@ -173,3 +173,5 @@ gradle-app.setting
 ### APPLICATION ###
 
 **/resources/static/img/thumbnail/**
+
+TEST-SERVER-API/**

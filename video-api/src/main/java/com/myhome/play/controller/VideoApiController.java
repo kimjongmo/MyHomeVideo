@@ -49,10 +49,9 @@ public class VideoApiController {
     }
 
     @PostMapping("/video")
-    public ResponseEntity insert(@RequestBody @Valid VideoInsertRequest videoInsertRequest) throws URISyntaxException {
+    public Header<Video> insert(@RequestBody @Valid VideoInsertRequest videoInsertRequest) throws URISyntaxException {
         Video video = videoApiService.insert(videoInsertRequest);
-        String uri = "/video/"+video.getId();
-        return ResponseEntity.created(new URI(uri)).body("");
+        return Header.OK("SUCCESS");
     }
 
 

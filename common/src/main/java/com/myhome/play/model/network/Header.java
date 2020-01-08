@@ -22,9 +22,10 @@ public class Header<T> {
                 .build();
     }
 
-    public static Header NOT_FOUND(){
+    public static Header OK(String description) {
         return Header.builder()
-                .status("NOT_FOUND")
+                .status("OK")
+                .description(description)
                 .build();
     }
 

@@ -1,23 +1,36 @@
 package com.myhome.play.service;
 
+import com.myhome.play.model.network.response.category.CategoryListResponse;
+import com.myhome.play.repo.CategoryRepository;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.Collections;
 import java.util.List;
+
+import static org.mockito.BDDMockito.given;
 
 public class CategoryServiceTest {
 
     private CategoryService categoryService;
 
+    @Mock
+    private CategoryRepository categoryRepository;
+
     @Before
     public void setUp(){
-        categoryService = new CategoryService();
+        MockitoAnnotations.initMocks(this);
+        categoryService = new CategoryService(categoryRepository);
+        ReflectionTestUtils.setField(categoryService, "HOME_PATH", "D:/MyHomeVideo");
     }
 
     @Test
     public void test(){
+        given(categoryRepository.findAll()).willReturn(Collections.emptyList());
         categoryService.HOME_PATH = "D:\\MyHomeVideo";
-        List<String> categoryList = categoryService.getCategoryList();
-        categoryList.forEach(System.out::println);
+        List<CategoryListResponse> categoryList = categoryService.getCategoryList();
     }
 }

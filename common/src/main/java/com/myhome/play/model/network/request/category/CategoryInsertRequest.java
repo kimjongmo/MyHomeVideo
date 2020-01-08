@@ -11,7 +11,7 @@ import javax.validation.constraints.NotEmpty;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CategoryInsertRequest {
-    @NotEmpty
+    @NotEmpty(message = "카테고리 이름을 설정해주세요")
     private String name;
 
 }

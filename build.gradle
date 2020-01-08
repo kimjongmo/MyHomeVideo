@@ -61,3 +61,11 @@ project(':front'){
         implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     }
 }
+
+project('TEST-SERVER-API'){
+    dependencies {
+        compile project(':common')
+        implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:2.1.6.RELEASE'
+        implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    }
+}

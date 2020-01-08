@@ -26,9 +26,8 @@ public class CategoryController {
     }
 
     @PostMapping("/category")
-    public ResponseEntity insert(@RequestBody @Valid CategoryInsertRequest request) throws URISyntaxException {
+    public Header insert(@RequestBody @Valid CategoryInsertRequest request) {
         Category category = categoryService.insert(request);
-        String uri = "/category/" +category.getId();
-        return ResponseEntity.created(new URI(uri)).body("");
+        return Header.OK("SUCCESS");
     }
 }
