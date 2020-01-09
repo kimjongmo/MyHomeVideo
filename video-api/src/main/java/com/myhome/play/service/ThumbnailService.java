@@ -25,7 +25,7 @@ public class ThumbnailService {
 
     public void create(File file){
         String pureFileName = videoUtils.getPureFileName(file);
-        File creatingImageFile = new File(thumbnailGenerator.getThumbnailPath() + "\\" + pureFileName + ".jpg");
+        File creatingImageFile = new File(thumbnailGenerator.THUMBNAIL_PATH + "\\" + pureFileName + ".jpg");
         thumbnailGenerator.extractImage(file, 60, creatingImageFile);
     }
 }

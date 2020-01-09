@@ -1,5 +1,6 @@
 package com.myhome.play.service;
 
+import com.myhome.play.model.entity.Category;
 import com.myhome.play.model.network.response.category.CategoryListResponse;
 import com.myhome.play.repo.CategoryRepository;
 import org.junit.Before;
@@ -8,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -29,7 +31,8 @@ public class CategoryServiceTest {
 
     @Test
     public void test(){
-        given(categoryRepository.findAll()).willReturn(Collections.emptyList());
+        List<Category> list = new ArrayList<>();
+        given(categoryRepository.findAll()).willReturn(list);
         categoryService.HOME_PATH = "D:\\MyHomeVideo";
         List<CategoryListResponse> categoryList = categoryService.getCategoryList();
     }

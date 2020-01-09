@@ -13,25 +13,28 @@ import java.io.InputStreamReader;
 
 @Component
 @Slf4j
-@Getter
-@Setter
 public class ThumbnailGenerator {
 
     @Value("${thumbnail.path}")
-    public String thumbnailPath;
+    public String THUMBNAIL_PATH;
     @Value("${ffmpeg.path}")
-    public String ffmpegPath;
+    public String FFMPEG_PATH;
 
     //해당 동영상의 이미지가 있는지 확인하는 메서드
-    public boolean isThumbnailExisted(String filePath) {
-        File file = new File(filePath);
+    public boolean isThumbnailExisted(String fileName) {
+        File file = new File(THUMBNAIL_PATH + "\\" + fileName + ".jpg");
         return file.exists();
+    }
+
+    public boolean removeThumbnail(String fileName) {
+        File file = new File(THUMBNAIL_PATH + "\\" + fileName + ".jpg");
+        return file.delete();
     }
 
     //동영상에서 이미지를 추출하여 섬네일을 만드는 메서드
     // 원본 소스 : https://javacan.tistory.com/tag/%EC%8D%B8%EB%84%A4%EC%9D%BC%EC%B6%94%EC%B6%9C
     public void extractImage(File videoFile, int position, File creatingImageFile) {
-        if(isThumbnailExisted(creatingImageFile.getAbsolutePath()))
+        if (isThumbnailExisted(creatingImageFile.getName()))
             return;
 
         try {
@@ -41,11 +44,11 @@ public class ThumbnailGenerator {
 
             String videoFilePath = videoFile.getAbsolutePath();
             String imageFilePath = creatingImageFile.getAbsolutePath();
-            log.info("videoFilePath={}",videoFilePath);
-            log.info("imageFilePath={}",imageFilePath);
-            log.info("videoFileExisted={}",videoFile.exists());
-            log.info("imageFileExisted={}",creatingImageFile.exists());
-            String[] commands = {this.ffmpegPath+"\\ffmpeg", "-ss",
+            log.info("videoFilePath={}", videoFilePath);
+            log.info("imageFilePath={}", imageFilePath);
+            log.info("videoFileExisted={}", videoFile.exists());
+            log.info("imageFileExisted={}", creatingImageFile.exists());
+            String[] commands = {FFMPEG_PATH + "\\ffmpeg", "-ss",
                     String.format("%02d:%02d:%02d", hours, minutes, seconds),
                     "-i", videoFilePath, "-an", "-vframes", "1", "-y",
                     imageFilePath};

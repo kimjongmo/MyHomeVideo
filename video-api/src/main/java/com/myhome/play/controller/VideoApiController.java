@@ -49,10 +49,11 @@ public class VideoApiController {
     }
 
     @PostMapping("/video")
-    public Header<Video> insert(@RequestBody @Valid VideoInsertRequest videoInsertRequest) throws URISyntaxException {
+    public Header<Video> insert(@RequestBody @Valid VideoInsertRequest videoInsertRequest){
         Video video = videoApiService.insert(videoInsertRequest);
         return Header.OK("SUCCESS");
     }
+
 
 
 }
