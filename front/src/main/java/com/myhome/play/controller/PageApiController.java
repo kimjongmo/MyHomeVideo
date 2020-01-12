@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -31,6 +32,11 @@ public class PageApiController {
     public Header<List<CategoryListResponse>> getCategory(){
         log.info("[/category]");
         return pageApiService.getCategoryList();
+    }
+
+    @GetMapping("/recentVideo")
+    public Header<List<VideoListResponse>> getRecentVideo(@RequestParam(required = false) String category){
+        return pageApiService.getRecentVideo(category);
     }
 
 }

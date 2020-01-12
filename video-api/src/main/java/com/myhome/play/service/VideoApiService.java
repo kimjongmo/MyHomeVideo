@@ -10,6 +10,7 @@ import com.myhome.play.model.network.request.video.VideoInsertRequest;
 import com.myhome.play.model.network.response.VideoListResponse;
 import com.myhome.play.repo.CategoryRepository;
 import com.myhome.play.repo.VideoRepository;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
@@ -61,6 +62,27 @@ public class VideoApiService {
         }
     }
 
+    public Header<List<VideoListResponse>> getRecentRegistered(String categoryName) {
+        if(Strings.isEmpty(categoryName)) {
+            List<Video> list = videoRepository.findTop5ByOrderByCreatedAtDesc();
+            return Header.OK(
+                    list.stream()
+                            .map(this::response)
+                            .collect(Collectors.toList())
+            );
+        }else{
+            Optional<Category> optionalCategory = categoryRepository.findByName(categoryName);
+            if(optionalCategory.isPresent()){
+                Category category = optionalCategory.get();
+                return Header.OK(videoRepository.findTop5ByCategoryOrderByCreatedAtDesc(category)
+                        .stream().map(this::response).collect(Collectors.toList()));
+            }
+            throw new CategoryNotFoundException(categoryName);
+        }
+
+
+    }
+
     public void play(HttpServletRequest req, HttpServletResponse res, Long id) throws ServletException, IOException {
         Optional<Video> optionalVideo = videoRepository.findById(id);
         if (!optionalVideo.isPresent()) {
@@ -81,29 +103,29 @@ public class VideoApiService {
         String fileName = data.getFileName();
         String categoryName = data.getCategoryName();
 
-        if(!fileNameCheck(fileName,categoryName))
+        if (!fileNameCheck(fileName, categoryName))
             throw new FileDuplicateException(fileName);
 
         Optional<Category> optionalCategory = categoryRepository.findByName(categoryName);
-        if(!optionalCategory.isPresent())
+        if (!optionalCategory.isPresent())
             throw new CategoryNotFoundException(categoryName);
 
-        String pureName = data.getFileName().substring(0,data.getFileName().lastIndexOf('.'));
+        String pureName = data.getFileName().substring(0, data.getFileName().lastIndexOf('.'));
         Video video = Video.builder()
                 .title(data.getTitle())
                 .fileName(fileName)
                 .category(categoryRepository.findByName(categoryName).get())
-                .imgUrl("/img/thumbnail/"+pureName+".jpg")
+                .imgUrl("/img/thumbnail/" + pureName + ".jpg")
                 .views(0L)
                 .build();
 
-        thumbnailService.create(new File(HOME_PATH+"/"+data.getCategoryName()+"/"+data.getFileName()));
+        thumbnailService.create(new File(HOME_PATH + "/" + data.getCategoryName() + "/" + data.getFileName()));
 
         return videoRepository.save(video);
     }
 
-    public boolean fileNameCheck(String fileName,String categoryName){
-        File file = new File(HOME_PATH+"/"+categoryName+"/"+fileName);
+    public boolean fileNameCheck(String fileName, String categoryName) {
+        File file = new File(HOME_PATH + "/" + categoryName + "/" + fileName);
         return !file.exists();
     }
 
@@ -116,4 +138,6 @@ public class VideoApiService {
                 .description(video.getFileName())
                 .build();
     }
+
+
 }

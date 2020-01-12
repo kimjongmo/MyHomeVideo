@@ -24,6 +24,8 @@ public class PageApiService {
 
     @Value("${video.server.api}")
     private String videoServer;
+    private ParameterizedTypeReference<Header<List<VideoListResponse>>> videoListResponseType
+            = new ParameterizedTypeReference<Header<List<VideoListResponse>>>() {};
 
     private RestTemplateService restTemplateService;
 
@@ -41,12 +43,8 @@ public class PageApiService {
                 .queryParam("category", videoListRequest.getCategory())
                 .queryParam("page", videoListRequest.getPage())
                 .encode().build().toUri();
-
-        ParameterizedTypeReference<Header<List<VideoListResponse>>> type
-                = new ParameterizedTypeReference<Header<List<VideoListResponse>>>() {
-        };
         try {
-            Header<List<VideoListResponse>> response = restTemplateService.exchange(uri, HttpMethod.GET, null, type);
+            Header<List<VideoListResponse>> response = restTemplateService.exchange(uri, HttpMethod.GET, null, videoListResponseType);
             return response;
         }catch (ResourceAccessException e){
             return Header.ERROR("API 서버와 연결이 되지 않습니다.");
@@ -75,6 +73,25 @@ public class PageApiService {
             return Header.ERROR("API 서버와 연결이 되지 않습니다.");
         } catch (Exception ex){
             log.info("[PageApiService][getCategoryList] error = {}",ex);
+            return Header.ERROR("알 수 없는 오류...");
+        }
+    }
+
+    public Header<List<VideoListResponse>> getRecentVideo(String category) {
+        URI uri = UriComponentsBuilder
+                .newInstance()
+                .fromHttpUrl(videoServer)
+                .path("/recentVideo")
+                .queryParam("category", category)
+                .encode().build().toUri();
+
+        try {
+            Header<List<VideoListResponse>> response = restTemplateService.exchange(uri, HttpMethod.GET, null, videoListResponseType);
+            return response;
+        }catch (ResourceAccessException e){
+            return Header.ERROR("API 서버와 연결이 되지 않습니다.");
+        }catch(Exception ex){
+            log.error("[PageApiService][getContents] request = {}, error = {}",category, ex.getMessage());
             return Header.ERROR("알 수 없는 오류...");
         }
     }

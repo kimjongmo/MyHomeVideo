@@ -28,7 +28,8 @@
             <!--            <div class="row" style="border: 1px solid red;">-->
             <!--                <h1>영상 컨텐츠 리스트</h1>-->
             <!--            </div>-->
-
+            <!-- 최근 등록된 동영상 -->
+            <div th:replace="fragment/RecentRegistered::recent"></div>
             <!-- 컨텐츠 리스트 START -->
             <div th:replace="fragment/ContentList::content-list"></div>
             <!-- 컨텐츠 리스트 END -->

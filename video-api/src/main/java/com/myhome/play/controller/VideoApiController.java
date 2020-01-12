@@ -54,6 +54,8 @@ public class VideoApiController {
         return Header.OK("SUCCESS");
     }
 
-
-
+    @GetMapping("/recentVideo")
+    public Header<List<VideoListResponse>> recentRegisteredVideo(@RequestParam(required = false) String category){
+        return videoApiService.getRecentRegistered(category);
+    }
 }

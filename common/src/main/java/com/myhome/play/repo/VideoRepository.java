@@ -11,4 +11,6 @@ import java.util.List;
 @Repository
 public interface VideoRepository extends JpaRepository<Video,Long> {
     List<Video> findAllByCategory(Category category, Pageable pageable);
+    List<Video> findTop5ByOrderByCreatedAtDesc();
+    List<Video> findTop5ByCategoryOrderByCreatedAtDesc(Category category);
 }
