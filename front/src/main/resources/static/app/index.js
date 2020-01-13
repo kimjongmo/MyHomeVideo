@@ -4,34 +4,12 @@ var carousels = new Vue({
     el: '#carousels',
     data: {
         recentVideos: '',
-        selected: '',
     },
     methods: {
-        select: function (index) {
-            carousels.selected = index;
-            console.log("selected =>"+carousels.selected);
-        },
-        isActive: function (index) {
-            return carousels.selected === index;
-        },
-        prev: function () {
-            if(carousels.selected == 0)
-                carousels.selected = 4;
-            else
-                carousels.selected = ((carousels.selected-1))
-        },
-        next: function () {
-           carousels.selected = ((carousels.selected+1)%5);
-        },
         move: function (id){
             playVideo(id);
         }
-
-
     },
-    updated: function () {
-        carousels.selected = 0;
-    }
 });
 
 var categories = new Vue({
@@ -84,6 +62,7 @@ var contentList = new Vue({
     }
 });
 
+/** 카테고리 선택시 RecentVideo, ContentList 데이터 갱신**/
 function loadVideoData(category) {
     $.ajax({
         url: "/contents?category=" + category + "&page=0",
@@ -101,7 +80,7 @@ function loadVideoData(category) {
     });
 
     $.ajax({
-        url: "/recentVideo?" + category,
+        url: "/recentVideo?category=" + category,
         type: "GET",
         contentType: "application/json",
         success: function (data) {
@@ -114,6 +93,7 @@ function loadVideoData(category) {
         }
     });
 
+    $(window).scroll(infiniteScroll);
 }
 
 function playVideo(id) {
@@ -131,6 +111,7 @@ function infiniteScroll() {
     }
 }
 
+/** 최초 페이지 준비된 후 카테고리 정보 및 최근 등록된 영상 데이터 GET **/
 $(document).ready(function () {
     $.ajax({
         url: '/category',
@@ -161,6 +142,6 @@ $(document).ready(function () {
             carousels.selected = 0;
         }
     });
-    $(window).scroll(infiniteScroll);
+
 });
 
