@@ -26,8 +26,11 @@ public class FileUploadController {
     public String upload(@RequestParam("file") List<MultipartFile> multipartFiles,
                          @RequestParam("category_id") Long categoryId,
                          @RequestParam List<String> title){
-        log.info("category Id : {}, title : {}",categoryId,title.get(0));
-        return fileUploadService.upload(multipartFiles,categoryId);
+//        log.info("category Id : {}, title : {}",categoryId,title.get(0));
+//        return fileUploadService.upload(multipartFiles,categoryId);
+
+        title.forEach(log::info);
+        return null;
     }
 
 }

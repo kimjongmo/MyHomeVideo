@@ -32,6 +32,14 @@
             top: 3px;
             left: 48%;
         }
+
+        .group-input {
+            border: 1px double red;
+        }
+
+        .category-input {
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -44,7 +52,7 @@
                 <hr>
             </div>
         </div>
-        <div class="row">
+        <div class="row category-input">
             <div class="col-md-3 field-label-responsive">
                 <label for="category_name">카테고리</label>
             </div>
@@ -60,32 +68,35 @@
                 <input id="newCategory" type="button" class="btn btn-danger" value="새 카테고리">
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-3 field-label-responsive">
-                <label for="file_name">파일 이름</label>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <div class="input-group mb-2 mr-sm-2 mb-sm-0">
-                        <input type="file" name="file" accept=".mp4" class="form-control" id="file_name"
-                               placeholder="동영상_제목.mp4">
+        <div class="group-input-list">
+            <div class="group-input">
+                <div class="row">
+                    <div class="col-md-3 field-label-responsive">
+                        <label for="file_name">파일 이름</label>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <div class="input-group mb-2 mr-sm-2 mb-sm-0">
+                                <input type="file" name="file" accept=".mp4" class="form-control" id="file_name"
+                                       placeholder="동영상_제목.mp4">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="button" class="btn btn-danger" value="파일 추가" onclick="addFile();">
                     </div>
                 </div>
-            </div>
-            <div class="col-md-3">
-                <input id="addFile" type="button" class="btn btn-danger" value="파일 추가">
-            </div>
-        </div>
-        <div id="file-list"></div>
-        <div class="row">
-            <div class="col-md-3 field-label-responsive">
-                <label for="title">제목</label>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <div class="input-group mb-2 mr-sm-2 mb-sm-0">
-                        <input type="text" name="title" class="form-control" id="title"
-                               placeholder="동영상 제목" required autofocus>
+                <div class="row">
+                    <div class="col-md-3 field-label-responsive">
+                        <label for="title">제목</label>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <div class="input-group mb-2 mr-sm-2 mb-sm-0">
+                                <input type="text" name="title" class="form-control" id="title"
+                                       placeholder="동영상 제목" required autofocus>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -103,18 +114,19 @@
     </div>
 </div>
 <script>
-
-
     function removeDiv(fileNumber) {
-        $('#file' + fileNumber).remove();
+        $('#group-input-'+fileNumber).remove();
     }
-
     function categoryLoad() {
         $.ajax({
             url: '/category',
             type: 'GET',
             contentType: 'application/json',
             success: function (data) {
+                if (data.status === 'ERROR') {
+                    alert(data.description);
+                    return;
+                }
                 let content = '';
                 let categories = data.data;
                 for (let i = 0; i < categories.length; i++)
@@ -124,24 +136,44 @@
         });
     }
 
+    var fileCnt = 1;
+    function addFile() {
+        var content =
+            '<div class="group-input" id="group-input-'+fileCnt+'">' +
+            '<div class="row">' +
+            '<div class="col-md-3 field-label-responsive">' +
+            '<label for="file_name">파일 이름</label>' +
+            '</div>' +
+            '<div class="col-md-6">' +
+            '<div class="form-group">' +
+            '<div class="input-group mb-2 mr-sm-2 mb-sm-0">' +
+            '<input type="file" name="file" accept=".mp4" class="form-control"' +
+            'placeholder="동영상_제목.mp4">' +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+            '<div class="col-md-3">' +
+            '<input type="button" class="btn btn-danger" value="Delete" onclick="removeDiv('+(fileCnt++)+');">' +
+            '</div>' +
+            '</div>' +
+            '<div class="row">' +
+            '<div class="col-md-3 field-label-responsive">' +
+            '<label for="title">제목</label>' +
+            '</div>' +
+            '<div class="col-md-6">' +
+            '<div class="form-group">' +
+            '<div class="input-group mb-2 mr-sm-2 mb-sm-0">' +
+            '<input type="text" name="title" class="form-control" placeholder="동영상 제목" required autofocus>' +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+            '</div>';
+        $('.group-input-list').append(content);
+    }
+
     $(document).ready(function () {
         var fileCnt = 1;
-        $('#addFile').click(function () {
-            var add = '<div class="row" id="file' + fileCnt + '"> ' +
-                '   <div class="col-md-3"></div> ' +
-                '   <div class="col-md-6">' +
-                '       <div class="form-group">' +
-                '           <div class="input-group mb-2 mr-sm-2 mb-sm-0">' +
-                '               <input type="file" name="file" accept=".mp4" class="form-control" placeholder="동영상_제목.mp4">' +
-                '           </div> ' +
-                '       </div> ' +
-                '   </div> ' +
-                '   <div class="col-md-3">' +
-                '       <input type="button" class="btn btn-primary" onclick="removeDiv(' + fileCnt + ')" value="지우기">' +
-                '   </div>' +
-                '</div>';
-            $('#file-list').append(add);
-        });
         $('#newCategory').click(function () {
             let name = prompt("추가할 카테고리 명을 입력하세요.", '');
             if (name !== '') {

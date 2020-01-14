@@ -43,6 +43,7 @@ public class VideoApiService {
         this.videoRepository = videoRepository;
         this.categoryRepository = categoryRepository;
         this.handler = handler;
+        this.thumbnailService = thumbnailService;
     }
 
 
@@ -103,9 +104,6 @@ public class VideoApiService {
         String fileName = data.getFileName();
         String categoryName = data.getCategoryName();
 
-        if (!fileNameCheck(fileName, categoryName))
-            throw new FileDuplicateException(fileName);
-
         Optional<Category> optionalCategory = categoryRepository.findByName(categoryName);
         if (!optionalCategory.isPresent())
             throw new CategoryNotFoundException(categoryName);
@@ -122,11 +120,6 @@ public class VideoApiService {
         thumbnailService.create(new File(HOME_PATH + "/" + data.getCategoryName() + "/" + data.getFileName()));
 
         return videoRepository.save(video);
-    }
-
-    public boolean fileNameCheck(String fileName, String categoryName) {
-        File file = new File(HOME_PATH + "/" + categoryName + "/" + fileName);
-        return !file.exists();
     }
 
     public VideoListResponse response(Video video) {
