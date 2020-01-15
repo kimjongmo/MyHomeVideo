@@ -1,5 +1,6 @@
 package com.myhome.play.controller;
 
+import com.myhome.play.model.network.Header;
 import com.myhome.play.service.FileUploadService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -23,14 +24,12 @@ public class FileUploadController {
     }
 
     @PostMapping(value = "/upload",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public String upload(@RequestParam("file") List<MultipartFile> multipartFiles,
+    public Header upload(@RequestParam("file") List<MultipartFile> multipartFiles,
                          @RequestParam("category_id") Long categoryId,
                          @RequestParam List<String> title){
-//        log.info("category Id : {}, title : {}",categoryId,title.get(0));
-//        return fileUploadService.upload(multipartFiles,categoryId);
-
+        log.info("category Id : {}",categoryId);
         title.forEach(log::info);
-        return null;
+        return fileUploadService.upload(multipartFiles,categoryId,title);
     }
 
 }

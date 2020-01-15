@@ -1,6 +1,9 @@
 package com.myhome.play.service;
 
+import com.myhome.play.exceptions.CategoryNotFoundException;
+import com.myhome.play.exceptions.DataSizeNotMatchException;
 import com.myhome.play.model.entity.Category;
+import com.myhome.play.model.network.Header;
 import com.myhome.play.repo.CategoryRepository;
 import com.myhome.play.repo.VideoRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -22,31 +25,43 @@ public class FileUploadService {
     private CategoryRepository categoryRepository;
     private VideoRepository videoRepository;
 
-    public FileUploadService(CategoryRepository categoryRepository,VideoRepository videoRepository){
+    public FileUploadService(CategoryRepository categoryRepository, VideoRepository videoRepository) {
         this.categoryRepository = categoryRepository;
         this.videoRepository = videoRepository;
     }
 
-    public String upload(List<MultipartFile> multipartFiles, Long categoryId){
-        Optional<Category> optionalCategory = categoryRepository.findById(categoryId);
-        if(!optionalCategory.isPresent())
-            return "카테고리가 존재하지 않습니다.";
+    public void validate(List<MultipartFile> multipartFiles, Long categoryId, List<String> titles) {
 
-        String path = ROOT_PATH+"/"+optionalCategory.get().getName();
+        if (!categoryRepository.findById(categoryId).isPresent())
+            throw new CategoryNotFoundException("카테고리를 찾을 수 없습니다");
+
+        if (multipartFiles.size() != titles.size()) {
+            throw new DataSizeNotMatchException("파일에는 제목이 꼭 필요합니다");
+        }
+
+    }
+
+    public Header upload(List<MultipartFile> multipartFiles, Long categoryId, List<String> titles) {
+
+        validate(multipartFiles, categoryId, titles);
+
+        String path = ROOT_PATH + "/" + categoryRepository.findById(categoryId).get().getName();
+
         StringBuilder success = new StringBuilder("-----------upload success list ---------------");
         StringBuilder fail = new StringBuilder("--------------upload fail list------------------");
+
         multipartFiles.forEach(file -> {
-            log.info("{}, {}, {}", file.getContentType(),file.getOriginalFilename(),file.getSize());
+            log.info("{}, {}, {}", file.getContentType(), file.getOriginalFilename(), file.getSize());
             try {
-                fileUpload(file,path);
-                success.append("\n"+file.getOriginalFilename());
+                fileUpload(file, path);
+                success.append("\n" + file.getOriginalFilename());
             } catch (IOException e) {
                 e.printStackTrace();
-                fail.append("\n"+file.getOriginalFilename());
+                fail.append("\n" + file.getOriginalFilename());
             }
         });
-        String ret = success.toString()+"\n"+fail.toString();
-        return ret;
+        String ret = success.toString() + "\n" + fail.toString();
+        return Header.OK(ret);
     }
 
     private void fileUpload(MultipartFile multipartFile, String path) throws IOException {
@@ -57,7 +72,7 @@ public class FileUploadService {
             byte[] buffer = new byte[4096 * 2];
             int read = 0;
             while ((read = bis.read(buffer)) != -1) {
-                bos.write(buffer,0,buffer.length);
+                bos.write(buffer, 0, buffer.length);
             }
             bos.flush();
         } catch (Exception e) {
