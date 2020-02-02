@@ -24,6 +24,7 @@
 </div>
 <video width="1000" height="400" controls>
     <source th:src="${server}+'/video/'+${id}" type="video/mp4">
+    <track th:src="'/vtt/'+${id}" kind="subtitles" srclang="ko" label="Korean" default>
 </video>
 <br>
 <a href="javascript:void(0);" onclick="history.back();" class="btn btn-block btn-success">뒤로가기</a>

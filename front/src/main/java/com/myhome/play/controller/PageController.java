@@ -36,6 +36,8 @@ public class PageController {
     public ModelAndView play(HttpServletRequest request, HttpServletResponse response, @PathVariable Long id) throws IOException {
         log.info("[/player/{}]", id);
 
+        // TODO: 2020-01-27 여기서 db에 접근하지 않고, api 서버서버로부터 데이터 받아 확인하기
+        // TODO: VTT 존재 여부, 비디오 존재 여부
         Optional<Video> optionalVideo = videoRepository.findById(id);
 
         if (!optionalVideo.isPresent()) {

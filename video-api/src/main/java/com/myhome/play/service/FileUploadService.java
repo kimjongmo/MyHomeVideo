@@ -4,6 +4,7 @@ import com.myhome.play.exceptions.CategoryNotFoundException;
 import com.myhome.play.exceptions.DataSizeNotMatchException;
 import com.myhome.play.model.entity.Category;
 import com.myhome.play.model.network.Header;
+import com.myhome.play.model.network.request.video.VideoInsertRequest;
 import com.myhome.play.repo.CategoryRepository;
 import com.myhome.play.repo.VideoRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -24,10 +25,12 @@ public class FileUploadService {
 
     private CategoryRepository categoryRepository;
     private VideoRepository videoRepository;
+    private VideoApiService videoApiService;
 
-    public FileUploadService(CategoryRepository categoryRepository, VideoRepository videoRepository) {
+    public FileUploadService(CategoryRepository categoryRepository, VideoRepository videoRepository, VideoApiService videoApiService) {
         this.categoryRepository = categoryRepository;
         this.videoRepository = videoRepository;
+        this.videoApiService = videoApiService;
     }
 
     public void validate(List<MultipartFile> multipartFiles, Long categoryId, List<String> titles) {
@@ -44,22 +47,27 @@ public class FileUploadService {
     public Header upload(List<MultipartFile> multipartFiles, Long categoryId, List<String> titles) {
 
         validate(multipartFiles, categoryId, titles);
-
-        String path = ROOT_PATH + "/" + categoryRepository.findById(categoryId).get().getName();
+        String categoryName = categoryRepository.findById(categoryId).get().getName();
+        String path = ROOT_PATH + "/" + categoryName;
 
         StringBuilder success = new StringBuilder("-----------upload success list ---------------");
         StringBuilder fail = new StringBuilder("--------------upload fail list------------------");
 
-        multipartFiles.forEach(file -> {
-            log.info("{}, {}, {}", file.getContentType(), file.getOriginalFilename(), file.getSize());
+        int length = multipartFiles.size();
+        for (int i = 0; i < length; i++) {
+            MultipartFile file = multipartFiles.get(i);
+            log.info("등록 중... =>file-type : {},name : {}, size : {}", file.getContentType(), file.getOriginalFilename(), file.getSize());
             try {
                 fileUpload(file, path);
                 success.append("\n" + file.getOriginalFilename());
+                // 데이터 등록
+                videoApiService.insert(getRequestData(categoryName, titles.get(i), file.getOriginalFilename()));
             } catch (IOException e) {
                 e.printStackTrace();
                 fail.append("\n" + file.getOriginalFilename());
+                // TODO: 2020-01-25 파일은 업로드 됬는데 insert()에서 실패시는 어떻게 할지 
             }
-        });
+        }
         String ret = success.toString() + "\n" + fail.toString();
         return Header.OK(ret);
     }
@@ -78,5 +86,13 @@ public class FileUploadService {
         } catch (Exception e) {
             log.info("{}", e);
         }
+    }
+
+    private VideoInsertRequest getRequestData(String categoryName, String title, String fileName) {
+        VideoInsertRequest requestData = new VideoInsertRequest();
+        requestData.setCategoryName(categoryName);
+        requestData.setTitle(title);
+        requestData.setFileName(fileName);
+        return requestData;
     }
 }

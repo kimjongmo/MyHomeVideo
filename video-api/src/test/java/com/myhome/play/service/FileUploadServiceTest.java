@@ -28,12 +28,14 @@ public class FileUploadServiceTest {
     private CategoryRepository categoryRepository;
     @Mock
     private VideoRepository videoRepository;
+    @Mock
+    private VideoApiService videoApiService;
 
 
     @Before
     public void setUp(){
         MockitoAnnotations.initMocks(this);
-        fileUploadService = new FileUploadService(categoryRepository,videoRepository);
+        fileUploadService = new FileUploadService(categoryRepository,videoRepository,videoApiService);
         ReflectionTestUtils.setField(fileUploadService, "ROOT_PATH", "D:/MyHomeVideo");
     }
 
@@ -71,4 +73,6 @@ public class FileUploadServiceTest {
         Long categoryId = 1L;
         fileUploadService.validate(fileList,categoryId,titles);
     }
+
+    // TODO: 2020-01-25 insert 실패 시 처리
 }

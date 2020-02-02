@@ -43,6 +43,33 @@
     </style>
 </head>
 <body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="/">Home Video</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
+                aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/">Home
+                        <span class="sr-only">(current)</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/register">Register</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Contact</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
 <div class="container">
     <form class="form-horizontal" role="form" enctype="multipart/form-data" method="post">
         <div class="row">
@@ -113,6 +140,11 @@
         <div class="percent">0%</div>
     </div>
 </div>
+<footer class="py-5 bg-dark">
+    <div class="container">
+        <p class="m-0 text-center text-white">Copyright &copy; Your Website 2019</p>
+    </div>
+</footer>
 <script>
     function removeDiv(fileNumber) {
         $('#group-input-'+fileNumber).remove();
@@ -210,13 +242,20 @@
             },
             // 업로드 시
             uploadProgress: function (event, position, total, percentComplete) {
-                var percentVal = percentComplete + '%';
+                var percentVal = '';
+
+                if(percentComplete === 100)
+                    percentVal = "잠시만 기다려주세요...(1분 이내)";
+                else
+                    percentVal = percentComplete + '%';
+
                 bar.width(percentVal);
                 percent.html(percentVal);
             },
             // // 완료 시
             complete: function (xhr) {
-                alert(xhr.responseText);
+                console.log(xhr.responseText);
+                alert(xhr.responseText.data);
                 window.location.reload();
             }
         });
