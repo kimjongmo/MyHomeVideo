@@ -1,4 +1,4 @@
-package com.myhome.play.controller.advices;
+package com.myhome.play.controller;
 
 import com.myhome.play.exceptions.CategoryNotFoundException;
 import com.myhome.play.exceptions.FileDuplicateException;

@@ -1,4 +1,4 @@
-package com.myhome.play.service;
+package com.myhome.play.serivce;
 
 import com.myhome.play.exceptions.CategoryNotFoundException;
 import com.myhome.play.exceptions.DataSizeNotMatchException;
@@ -7,12 +7,17 @@ import com.myhome.play.model.network.Header;
 import com.myhome.play.model.network.request.video.VideoInsertRequest;
 import com.myhome.play.repo.CategoryRepository;
 import com.myhome.play.repo.VideoRepository;
+import com.myhome.play.service.RestTemplateService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.*;
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,15 +27,17 @@ public class FileUploadService {
 
     @Value("${home.path}")
     public String ROOT_PATH;
+    @Value("${video.server.ip}")
+    private String videoServerIp;
 
     private CategoryRepository categoryRepository;
     private VideoRepository videoRepository;
-    private VideoApiService videoApiService;
+    private RestTemplateService restTemplateService;
 
-    public FileUploadService(CategoryRepository categoryRepository, VideoRepository videoRepository, VideoApiService videoApiService) {
+    public FileUploadService(CategoryRepository categoryRepository, VideoRepository videoRepository,RestTemplateService restTemplateService) {
         this.categoryRepository = categoryRepository;
         this.videoRepository = videoRepository;
-        this.videoApiService = videoApiService;
+        this.restTemplateService = restTemplateService;
     }
 
     public void validate(List<MultipartFile> multipartFiles, Long categoryId, List<String> titles) {
@@ -61,7 +68,12 @@ public class FileUploadService {
                 fileUpload(file, path);
                 success.append("\n" + file.getOriginalFilename());
                 // 데이터 등록
-                videoApiService.insert(getRequestData(categoryName, titles.get(i), file.getOriginalFilename()));
+               Header result = insert(getRequestData(categoryName, titles.get(i), file.getOriginalFilename()));
+               if(result.getDescription().equals("SUCCESS"))
+                   log.info("--데이터 메타데이터 등록 성공--");
+               else{
+                   // TODO: 2020-02-03 파일 삭제
+               }
             } catch (IOException e) {
                 e.printStackTrace();
                 fail.append("\n" + file.getOriginalFilename());
@@ -94,5 +106,17 @@ public class FileUploadService {
         requestData.setTitle(title);
         requestData.setFileName(fileName);
         return requestData;
+    }
+
+    private Header insert(VideoInsertRequest request){
+        URI uri = UriComponentsBuilder
+                .fromHttpUrl(videoServerIp)
+                .path("/video")
+                .build()
+                .toUri();
+
+        ParameterizedTypeReference<Header> type = new ParameterizedTypeReference<Header>() {};
+
+        return restTemplateService.exchange(uri, HttpMethod.POST,request,type);
     }
 }

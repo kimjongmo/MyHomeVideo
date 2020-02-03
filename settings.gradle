@@ -3,4 +3,5 @@ include 'video-api'
 include 'common'
 include 'front'
 include 'TEST-SERVER-API'
+include 'upload-api'
 

@@ -1,5 +1,6 @@
 package com.myhome.play.controller.advices;
 
+import com.myhome.play.exceptions.CategoryNotFoundException;
 import com.myhome.play.exceptions.DataSizeNotMatchException;
 import com.myhome.play.model.network.Header;
 import org.springframework.http.HttpStatus;
@@ -14,14 +15,16 @@ public class FileUploadAdvice {
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public Header mediaTypeError(){
+    public Header mediaTypeError() {
         return Header.ERROR("미디어 타입이 올바르지 않습니다.");
     }
 
-    @ExceptionHandler(DataSizeNotMatchException.class)
+    @ExceptionHandler({DataSizeNotMatchException.class, CategoryNotFoundException.class})
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public Header dataSizeError(RuntimeException e){
+    public Header dataSizeError(RuntimeException e) {
         return Header.OK(e.getMessage());
     }
+
+
 }

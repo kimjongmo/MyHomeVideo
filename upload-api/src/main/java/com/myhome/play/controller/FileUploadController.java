@@ -1,7 +1,7 @@
 package com.myhome.play.controller;
 
 import com.myhome.play.model.network.Header;
-import com.myhome.play.service.FileUploadService;
+import com.myhome.play.serivce.FileUploadService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;

@@ -44,10 +44,6 @@ public class ThumbnailGenerator {
 
             String videoFilePath = videoFile.getAbsolutePath();
             String imageFilePath = creatingImageFile.getAbsolutePath();
-            log.info("videoFilePath={}", videoFilePath);
-            log.info("imageFilePath={}", imageFilePath);
-            log.info("videoFileExisted={}", videoFile.exists());
-            log.info("imageFileExisted={}", creatingImageFile.exists());
             String[] commands = {FFMPEG_PATH + "\\ffmpeg", "-ss",
                     String.format("%02d:%02d:%02d", hours, minutes, seconds),
                     "-i", videoFilePath, "-an", "-vframes", "1", "-y",

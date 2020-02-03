@@ -32,7 +32,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(VideoApiController.class)
-@ContextConfiguration(classes = {JsonMapper.class})
 public class VideoApiControllerTest {
     @Autowired
     private MockMvc mvc;

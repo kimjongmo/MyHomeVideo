@@ -1,4 +1,4 @@
-package com.myhome.play.controller.advices;
+package com.myhome.play.controller;
 
 import com.myhome.play.exceptions.CategoryDuplicateException;
 import com.myhome.play.model.network.Header;
