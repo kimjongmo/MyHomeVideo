@@ -57,7 +57,6 @@ public class PageApiService {
     public Header<List<CategoryListResponse>> getCategoryList() {
 
         URI uri = UriComponentsBuilder
-                .newInstance()
                 .fromHttpUrl(videoServer)
                 .path("/category")
                 .build().toUri();
