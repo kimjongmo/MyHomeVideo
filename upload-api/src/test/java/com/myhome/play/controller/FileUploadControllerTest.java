@@ -18,6 +18,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @RunWith(SpringRunner.class)
 @WebMvcTest(FileUploadController.class)
 public class FileUploadControllerTest {
@@ -29,11 +38,11 @@ public class FileUploadControllerTest {
 
     @Test
     public void other_media_type_request_test() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/upload")
+        mvc.perform(post("/upload")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content("{}"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("미디어 타입")));
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("미디어 타입")));
     }
 
     @Test
@@ -44,11 +53,11 @@ public class FileUploadControllerTest {
                 "test".getBytes());
 
 
-        mvc.perform(MockMvcRequestBuilders.multipart("/upload")
+        mvc.perform(multipart("/upload")
                 .file(file)
                 .param("category_id", "1")
                 .param("title", "제목"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -63,17 +72,17 @@ public class FileUploadControllerTest {
                 "multipart/form-data",
                 "test".getBytes());
 
-        mvc.perform(MockMvcRequestBuilders.multipart("/upload")
+        mvc.perform(multipart("/upload")
                 .file(file)
                 .param("category_id", "1")
                 .param("title", "제목", "제목2"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(status().isOk());
     }
 
     @Test
     public void invalid_category_id_request_test() throws Exception {
 
-        BDDMockito.given(fileUploadService.upload(ArgumentMatchers.anyList(), ArgumentMatchers.anyLong(), ArgumentMatchers.anyList()))
+        given(fileUploadService.upload(anyList(), anyLong(), anyList()))
                 .willThrow(new CategoryNotFoundException("카테고리를 찾을 수 없습니다"));
 
         MockMultipartFile file = new MockMultipartFile("file",
@@ -81,18 +90,18 @@ public class FileUploadControllerTest {
                 "multipart/form-data",
                 "test".getBytes());
 
-        mvc.perform(MockMvcRequestBuilders.multipart("/upload")
+        mvc.perform(multipart("/upload")
                 .file(file)
                 .param("category_id", "1")
                 .param("title", "제목"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("카테고리")));
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("카테고리")));
     }
 
     @Test
     public void multi_invalid_data_size_request_test() throws Exception {
 
-        BDDMockito.given(fileUploadService.upload(ArgumentMatchers.anyList(), ArgumentMatchers.anyLong(), ArgumentMatchers.anyList()))
+        given(fileUploadService.upload(anyList(), anyLong(), anyList()))
                 .willThrow(new DataSizeNotMatchException("파일에는 제목이 꼭 필요합니다"));
 
         MockMultipartFile file = new MockMultipartFile("file",
@@ -105,12 +114,12 @@ public class FileUploadControllerTest {
                 "multipart/form-data",
                 "test".getBytes());
 
-        mvc.perform(MockMvcRequestBuilders.multipart("/upload")
+        mvc.perform(multipart("/upload")
                 .file(file)
                 .param("category_id", "1")
                 .param("title","제목1"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("파일에는 제목이")));
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("파일에는 제목이")));
     }
 
 }

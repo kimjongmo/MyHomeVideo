@@ -2,6 +2,7 @@ package com.myhome.play.serivce;
 
 import com.myhome.play.exceptions.CategoryNotFoundException;
 import com.myhome.play.exceptions.DataSizeNotMatchException;
+import com.myhome.play.exceptions.FileDuplicateException;
 import com.myhome.play.model.entity.Category;
 import com.myhome.play.model.network.Header;
 import com.myhome.play.model.network.request.video.VideoInsertRequest;
@@ -31,12 +32,10 @@ public class FileUploadService {
     private String videoServerIp;
 
     private CategoryRepository categoryRepository;
-    private VideoRepository videoRepository;
     private RestTemplateService restTemplateService;
 
-    public FileUploadService(CategoryRepository categoryRepository, VideoRepository videoRepository,RestTemplateService restTemplateService) {
+    public FileUploadService(CategoryRepository categoryRepository,RestTemplateService restTemplateService) {
         this.categoryRepository = categoryRepository;
-        this.videoRepository = videoRepository;
         this.restTemplateService = restTemplateService;
     }
 
@@ -48,6 +47,7 @@ public class FileUploadService {
         if (multipartFiles.size() != titles.size()) {
             throw new DataSizeNotMatchException("파일에는 제목이 꼭 필요합니다");
         }
+
 
     }
 
@@ -65,27 +65,35 @@ public class FileUploadService {
             MultipartFile file = multipartFiles.get(i);
             log.info("등록 중... =>file-type : {},name : {}, size : {}", file.getContentType(), file.getOriginalFilename(), file.getSize());
             try {
+
                 fileUpload(file, path);
-                success.append("\n" + file.getOriginalFilename());
-                // 데이터 등록
-               Header result = insert(getRequestData(categoryName, titles.get(i), file.getOriginalFilename()));
-               if(result.getDescription().equals("SUCCESS"))
-                   log.info("--데이터 메타데이터 등록 성공--");
+
+                Header result = insert(getRequestData(categoryName, titles.get(i), file.getOriginalFilename()));
+
+                if(result.getDescription().equals("SUCCESS")) {
+                    success.append("\n" + file.getOriginalFilename()+"가 등록되었습니다.");
+                    log.info("--데이터 메타데이터 등록 성공--");
+                }
                else{
                    // TODO: 2020-02-03 파일 삭제
+                   log.info("---비디오 메타데이터 등록 실패:"+result.getDescription());
                }
+            }catch(FileDuplicateException fe){
+              fail.append("\n"+file.getOriginalFilename()+" 파일이 중복됩니다");
             } catch (IOException e) {
                 e.printStackTrace();
                 fail.append("\n" + file.getOriginalFilename());
-                // TODO: 2020-01-25 파일은 업로드 됬는데 insert()에서 실패시는 어떻게 할지 
             }
         }
         String ret = success.toString() + "\n" + fail.toString();
         return Header.OK(ret);
     }
 
-    private void fileUpload(MultipartFile multipartFile, String path) throws IOException {
+    public void fileUpload(MultipartFile multipartFile, String path) throws IOException {
         File uploadFile = new File(path + "/" + multipartFile.getOriginalFilename());
+        if(uploadFile.exists()){
+            throw new FileDuplicateException();
+        }
         uploadFile.createNewFile();
         try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(uploadFile));
              BufferedInputStream bis = new BufferedInputStream(multipartFile.getInputStream());) {
@@ -108,7 +116,7 @@ public class FileUploadService {
         return requestData;
     }
 
-    private Header insert(VideoInsertRequest request){
+    public Header insert(VideoInsertRequest request){
         URI uri = UriComponentsBuilder
                 .fromHttpUrl(videoServerIp)
                 .path("/video")
