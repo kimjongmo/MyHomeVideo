@@ -10,6 +10,7 @@ import com.myhome.play.model.network.request.video.VideoInsertRequest;
 import com.myhome.play.model.network.response.VideoListResponse;
 import com.myhome.play.repo.CategoryRepository;
 import com.myhome.play.repo.VideoRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +21,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
@@ -27,6 +29,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class VideoApiService {
 
     @Value("${home.path}")
@@ -117,7 +120,12 @@ public class VideoApiService {
                 .views(0L)
                 .build();
 
-        thumbnailService.create(new File(HOME_PATH + "/" + data.getCategoryName() + "/" + data.getFileName()));
+        // TODO: 2020-02-04 썸네일 생성을 비동기로 생성하는 방식으로 바꾸기
+        try {
+            thumbnailService.create(new File(HOME_PATH + "/" + data.getCategoryName() + "/" + data.getFileName()));
+        } catch (FileNotFoundException e) {
+            log.error("썸네일 생성 실패: {}",HOME_PATH + "/" + data.getCategoryName() + "/" + data.getFileName());
+        }
 
         return videoRepository.save(video);
     }
