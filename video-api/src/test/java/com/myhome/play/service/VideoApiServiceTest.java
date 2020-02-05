@@ -8,6 +8,7 @@ import com.myhome.play.model.entity.Video;
 import com.myhome.play.model.network.Header;
 import com.myhome.play.model.network.request.video.VideoInsertRequest;
 import com.myhome.play.model.network.response.VideoListResponse;
+import com.myhome.play.model.network.response.video.VideoInfoResponse;
 import com.myhome.play.repo.CategoryRepository;
 import com.myhome.play.repo.VideoRepository;
 import org.junit.Before;
@@ -23,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
@@ -106,6 +108,54 @@ public class VideoApiServiceTest {
 
         assertTrue(response.getStatus().equals("OK"));
         assertTrue(response.getData().size()==0);
+    }
+
+    @Test
+    public void get_info_valid_data_test(){
+        Long id = 1L;
+
+        Video video = Video.builder().build();
+        video.setId(id);
+        video.setCategory(Category.builder().name("테스트").build());
+
+        given(videoRepository.findById(id)).willReturn(Optional.of(video));
+
+        Header<VideoInfoResponse> header = videoApiService.getInfo(id);
+
+        assertEquals(header.getStatus(),"OK");
+        assertEquals(header.getData().getId(),id);
+    }
+
+    @Test
+    public void get_info_invalid_data_test(){
+        Long id = 1L;
+
+        given(videoRepository.findById(id)).willReturn(Optional.empty());
+
+        Header<VideoInfoResponse> header = videoApiService.getInfo(id);
+
+        assertEquals(header.getStatus(),"ERROR");
+        assertEquals(header.getData(),null);
+        assertEquals(header.getDescription(),"존재하지 않는 데이터");
+
+    }
+
+    @Test
+    public void get_info_view_count_test(){
+        // INPUT
+        Long id = 1L;
+
+        // GIVEN
+        Video video = Video.builder().build();
+        video.setId(id);
+        video.setCategory(Category.builder().name("테스트").build());
+
+        given(videoRepository.findById(id)).willReturn(Optional.of(video));
+        given(videoRepository.save(any())).will(invocation -> invocation.getArgument(0));
+
+        //비동기로 여러 번 찌르기
+
+
     }
 
     // TODO: 2020-01-09 최근 등록 메서드 테스트 추가하기

@@ -8,6 +8,7 @@ import com.myhome.play.model.entity.Video;
 import com.myhome.play.model.network.Header;
 import com.myhome.play.model.network.request.video.VideoInsertRequest;
 import com.myhome.play.model.network.response.VideoListResponse;
+import com.myhome.play.model.network.response.video.VideoInfoResponse;
 import com.myhome.play.repo.CategoryRepository;
 import com.myhome.play.repo.VideoRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -140,5 +142,25 @@ public class VideoApiService {
                 .build();
     }
 
+    @Transactional
+    public Header<VideoInfoResponse> getInfo(Long id) {
+        Optional<Video> optionalVideo = videoRepository.findById(id);
+        if(!optionalVideo.isPresent()){
+            return Header.ERROR("존재하지 않는 데이터");
+        }
+        Video video = optionalVideo.get();
+        video.setViews(video.getViews()+1);
+        videoRepository.save(video);
 
+        VideoInfoResponse videoInfoResponse = VideoInfoResponse.builder()
+                .id(video.getId())
+                .title(video.getTitle())
+                .categoryName(video.getCategory().getName())
+                .imgUrl(video.getImgUrl())
+                .fileName(video.getFileName())
+                .views(video.getViews())
+                .build();
+
+        return Header.OK(videoInfoResponse);
+    }
 }

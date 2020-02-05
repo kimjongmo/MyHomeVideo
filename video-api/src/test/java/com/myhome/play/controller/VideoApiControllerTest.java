@@ -5,6 +5,7 @@ import com.myhome.play.exceptions.FileDuplicateException;
 import com.myhome.play.model.network.Header;
 import com.myhome.play.model.network.request.video.VideoInsertRequest;
 import com.myhome.play.model.network.response.VideoListResponse;
+import com.myhome.play.model.network.response.video.VideoInfoResponse;
 import com.myhome.play.service.ThumbnailService;
 import com.myhome.play.service.VideoApiService;
 import com.myhome.play.utils.JsonMapper;
@@ -77,6 +78,30 @@ public class VideoApiControllerTest {
         mvc.perform(get("/video?category=테스트")
                 .contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
+        ;
+    }
+
+    @Test
+    public void get_info_with_valid_request() throws Exception {
+        Long id = 1L;
+        given(videoApiService.getInfo(id)).willReturn(Header.OK(VideoInfoResponse.builder().id(1L).build()));
+
+        mvc.perform((get("/video/info")).param("id", id.toString()))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString(id.toString())))
+        ;
+    }
+
+    @Test
+    public void get_info_with_invalid_request() throws Exception {
+        Long id = 1L;
+
+        given(videoApiService.getInfo(id)).willReturn(Header.ERROR("존재하지 않는 데이터"));
+
+        mvc.perform((get("/video/info")).param("id", id.toString()))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("ERROR")))
+                .andExpect(content().string(containsString("존재하지")))
         ;
     }
 
