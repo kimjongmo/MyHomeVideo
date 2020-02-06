@@ -63,7 +63,7 @@ public class RegisterApiControllerTest {
 
     @Test
     public void video_valid_test__file_name_is_mp4() throws Exception {
-        given(registerApiService.register(any(), any())).willReturn(Header.OK("SUCCESS"));
+        given(registerApiService.register(any(), any())).willReturn(Header.MESSAGE("SUCCESS"));
 
         mvc.perform(post("/video")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)

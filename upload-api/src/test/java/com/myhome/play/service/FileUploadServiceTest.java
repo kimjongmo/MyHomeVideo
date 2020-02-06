@@ -104,7 +104,7 @@ public class FileUploadServiceTest {
         given(categoryRepository.findById(categoryId))
                 .willReturn(Optional.of(Category.builder().name("테스트").build()));
 
-        doReturn(Header.OK("SUCCESS")).when(mockFileUploadService)
+        doReturn(Header.MESSAGE("SUCCESS")).when(mockFileUploadService)
                 .insert(any());
 
         doNothing().when(mockFileUploadService)

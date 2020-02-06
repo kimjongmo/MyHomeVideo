@@ -14,7 +14,7 @@ public class CategoryAdvice {
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public Header duplicate(RuntimeException e){
-        return Header.OK(e.getMessage());
+        return Header.MESSAGE(e.getMessage());
     }
 
 }

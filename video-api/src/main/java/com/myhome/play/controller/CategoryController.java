@@ -6,12 +6,9 @@ import com.myhome.play.model.network.request.category.CategoryInsertRequest;
 import com.myhome.play.model.network.response.category.CategoryListResponse;
 import com.myhome.play.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 
 @RestController
@@ -28,6 +25,6 @@ public class CategoryController {
     @PostMapping("/category")
     public Header insert(@RequestBody @Valid CategoryInsertRequest request) {
         Category category = categoryService.insert(request);
-        return Header.OK("SUCCESS");
+        return Header.MESSAGE("SUCCESS");
     }
 }

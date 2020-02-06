@@ -3,11 +3,9 @@ package com.myhome.play.serivce;
 import com.myhome.play.exceptions.CategoryNotFoundException;
 import com.myhome.play.exceptions.DataSizeNotMatchException;
 import com.myhome.play.exceptions.FileDuplicateException;
-import com.myhome.play.model.entity.Category;
 import com.myhome.play.model.network.Header;
 import com.myhome.play.model.network.request.video.VideoInsertRequest;
 import com.myhome.play.repo.CategoryRepository;
-import com.myhome.play.repo.VideoRepository;
 import com.myhome.play.service.RestTemplateService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +18,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.*;
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -86,7 +83,7 @@ public class FileUploadService {
             }
         }
         String ret = success.toString() + "\n" + fail.toString();
-        return Header.OK(ret);
+        return Header.MESSAGE(ret);
     }
 
     public void fileUpload(MultipartFile multipartFile, String path) throws IOException {

@@ -22,7 +22,7 @@ public class Header<T> {
                 .build();
     }
 
-    public static Header OK(String description) {
+    public static Header MESSAGE(String description) {
         return Header.builder()
                 .status("OK")
                 .description(description)

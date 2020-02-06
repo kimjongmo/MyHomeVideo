@@ -65,7 +65,7 @@ public class RegisterApiServiceTest {
     public void 카테고리_등록_API_정상_연결_테스트() {
         String category = "런닝맨";
         given(restTemplateService.exchange(any(), eq(HttpMethod.POST),any(),any()))
-                .willReturn(Header.OK("SUCCESS"));
+                .willReturn(Header.MESSAGE("SUCCESS"));
 
         CategoryInsertRequest request = new CategoryInsertRequest();
         request.setName(category);
@@ -78,7 +78,7 @@ public class RegisterApiServiceTest {
     @Test
     public void 비디오_등록_API_정상_연결_테스트() {
         given(restTemplateService.exchange(any(), eq(HttpMethod.POST),any(),any()))
-                .willReturn(Header.OK("SUCCESS"));
+                .willReturn(Header.MESSAGE("SUCCESS"));
 
         VideoInsertRequest video = new VideoInsertRequest();
 
@@ -96,7 +96,7 @@ public class RegisterApiServiceTest {
 
         String category = "런닝맨";
         given(restTemplateService.exchange(any(), eq(HttpMethod.POST),any(),any()))
-                .willReturn(Header.OK(category+" 카테고리는 이미 존재합니다."));
+                .willReturn(Header.MESSAGE(category+" 카테고리는 이미 존재합니다."));
 
         CategoryInsertRequest request = new CategoryInsertRequest();
         request.setName(category);
@@ -109,7 +109,7 @@ public class RegisterApiServiceTest {
     public void 비디오_중복일_때(){
         String fileName = "test.mp4";
         given(restTemplateService.exchange(any(), eq(HttpMethod.POST),any(),any()))
-                .willReturn(Header.OK(fileName+"이 중복됩니다."));
+                .willReturn(Header.MESSAGE(fileName+"이 중복됩니다."));
 
         VideoInsertRequest video = new VideoInsertRequest();
 
@@ -126,7 +126,7 @@ public class RegisterApiServiceTest {
     public void 비디오_생성시_없는_카테고리(){
         String categoryName = "TEST";
         given(restTemplateService.exchange(any(), eq(HttpMethod.POST),any(),any()))
-                .willReturn(Header.OK(categoryName+" 카테고리를 찾을 수 없습니다"));
+                .willReturn(Header.MESSAGE(categoryName+" 카테고리를 찾을 수 없습니다"));
 
         VideoInsertRequest video = new VideoInsertRequest();
 

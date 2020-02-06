@@ -23,7 +23,7 @@ public class FileUploadAdvice {
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public Header dataSizeError(RuntimeException e) {
-        return Header.OK(e.getMessage());
+        return Header.MESSAGE(e.getMessage());
     }
 
 
