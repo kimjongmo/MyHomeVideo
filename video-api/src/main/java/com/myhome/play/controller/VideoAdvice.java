@@ -3,7 +3,6 @@ package com.myhome.play.controller;
 import com.myhome.play.exceptions.CategoryNotFoundException;
 import com.myhome.play.exceptions.FileDuplicateException;
 import com.myhome.play.model.network.Header;
-import org.omg.SendingContext.RunTime;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @ControllerAdvice
@@ -24,7 +22,7 @@ public class VideoAdvice {
     @ExceptionHandler({FileDuplicateException.class,
             CategoryNotFoundException.class,})
     public Header videoError(RuntimeException e) {
-        return Header.OK(e.getMessage());
+        return Header.MESSAGE(e.getMessage());
     }
 
     @ResponseBody
@@ -36,7 +34,7 @@ public class VideoAdvice {
 
         message.append(params.toString() + "가 요구됩니다.");
 
-        return Header.OK(message.toString());
+        return Header.MESSAGE(message.toString());
     }
 
     private List<String> getRequestParamInError(String message) {

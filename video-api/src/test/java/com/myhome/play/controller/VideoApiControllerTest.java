@@ -105,7 +105,10 @@ public class VideoApiControllerTest {
         ;
     }
 
+    @Test
+    public void get_info_with_valid_multi_request(){
 
+    }
     // TODO: 2020-01-09 404 Error나는 것 나중에 잡기
 //    @Test
 //    public void insert_with_duplicate_file() throws Exception {

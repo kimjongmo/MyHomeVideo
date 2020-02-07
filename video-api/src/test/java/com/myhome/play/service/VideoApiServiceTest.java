@@ -19,13 +19,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.concurrent.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -82,13 +80,13 @@ public class VideoApiServiceTest {
         given(categoryRepository.findByName(any()))
                 .willReturn(Optional.of(mockCategory));
 
-        given(videoRepository.findAllByCategory(any(),any())).willReturn(list);
+        given(videoRepository.findAllByCategory(any(), any())).willReturn(list);
 
         Header<List<VideoListResponse>> response
-                = videoApiService.getList("런닝맨", PageRequest.of(0,6));
+                = videoApiService.getList("런닝맨", PageRequest.of(0, 6));
 
         assertTrue(response.getStatus().equals("OK"));
-        assertTrue(response.getData().size()==2);
+        assertTrue(response.getData().size() == 2);
 
     }
 
@@ -101,17 +99,17 @@ public class VideoApiServiceTest {
         given(categoryRepository.findByName(any()))
                 .willReturn(Optional.of(mockCategory));
 
-        given(videoRepository.findAllByCategory(any(),any())).willReturn(Collections.emptyList());
+        given(videoRepository.findAllByCategory(any(), any())).willReturn(Collections.emptyList());
 
         Header<List<VideoListResponse>> response
-                = videoApiService.getList("런닝맨", PageRequest.of(0,6));
+                = videoApiService.getList("런닝맨", PageRequest.of(0, 6));
 
         assertTrue(response.getStatus().equals("OK"));
-        assertTrue(response.getData().size()==0);
+        assertTrue(response.getData().size() == 0);
     }
 
     @Test
-    public void get_info_valid_data_test(){
+    public void get_info_valid_data_test() {
         Long id = 1L;
 
         Video video = Video.builder().build();
@@ -122,40 +120,42 @@ public class VideoApiServiceTest {
 
         Header<VideoInfoResponse> header = videoApiService.getInfo(id);
 
-        assertEquals(header.getStatus(),"OK");
-        assertEquals(header.getData().getId(),id);
+        assertEquals(header.getStatus(), "OK");
+        assertEquals(header.getData().getId(), id);
     }
 
     @Test
-    public void get_info_invalid_data_test(){
+    public void get_info_invalid_data_test() {
         Long id = 1L;
 
         given(videoRepository.findById(id)).willReturn(Optional.empty());
 
         Header<VideoInfoResponse> header = videoApiService.getInfo(id);
 
-        assertEquals(header.getStatus(),"ERROR");
-        assertEquals(header.getData(),null);
-        assertEquals(header.getDescription(),"존재하지 않는 데이터");
+        assertEquals(header.getStatus(), "ERROR");
+        assertEquals(header.getData(), null);
+        assertEquals(header.getDescription(), "존재하지 않는 데이터");
 
     }
 
     @Test
-    public void get_info_view_count_test(){
+    public void get_info_view_count_test() throws ExecutionException, InterruptedException {
         // INPUT
         Long id = 1L;
 
         // GIVEN
-        Video video = Video.builder().build();
+        Video video = Video.builder().views(0L).category(Category.builder().name("테스트").build()).build();
         video.setId(id);
-        video.setCategory(Category.builder().name("테스트").build());
 
         given(videoRepository.findById(id)).willReturn(Optional.of(video));
-        given(videoRepository.save(any())).will(invocation -> invocation.getArgument(0));
+        given(videoRepository.save(any())).will(invocation -> {
+            return invocation.getArgument(0);
+        });
 
-        //비동기로 여러 번 찌르기
-
-
+        Header<VideoInfoResponse> result = videoApiService.getInfo(id);
+        assertEquals(result.getStatus(), "OK");
+        assertTrue(result.getData() != null);
+        assertEquals(result.getData().getViews(), Long.valueOf(1L));
     }
 
     // TODO: 2020-01-09 최근 등록 메서드 테스트 추가하기

@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.ServletException;
@@ -26,6 +27,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -141,16 +143,18 @@ public class VideoApiService {
                 .description(video.getFileName())
                 .build();
     }
-
     @Transactional
     public Header<VideoInfoResponse> getInfo(Long id) {
-        Optional<Video> optionalVideo = videoRepository.findById(id);
+
+        Optional<Video> optionalVideo = videoRepository.findByIdForUpdate(id);
         if(!optionalVideo.isPresent()){
             return Header.ERROR("존재하지 않는 데이터");
         }
+
         Video video = optionalVideo.get();
         video.setViews(video.getViews()+1);
         videoRepository.save(video);
+
 
         VideoInfoResponse videoInfoResponse = VideoInfoResponse.builder()
                 .id(video.getId())
