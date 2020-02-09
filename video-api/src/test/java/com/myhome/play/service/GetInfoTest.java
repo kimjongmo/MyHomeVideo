@@ -22,7 +22,7 @@ public class GetInfoTest {
     @Autowired
     private VideoRepository videoRepository;
 
-    @Test
+//    @Test
     public void multi_request_get_info_test(){
 
         List<Long> results = new ArrayList<>();
