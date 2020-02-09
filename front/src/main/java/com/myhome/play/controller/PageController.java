@@ -1,7 +1,10 @@
 package com.myhome.play.controller;
 
 import com.myhome.play.model.entity.Video;
+import com.myhome.play.model.network.Header;
+import com.myhome.play.model.network.response.video.VideoInfoResponse;
 import com.myhome.play.repo.VideoRepository;
+import com.myhome.play.service.VideoApiService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -21,6 +24,8 @@ public class PageController {
 
     @Autowired
     private VideoRepository videoRepository;
+    @Autowired
+    private VideoApiService videoApiService;
 
     @GetMapping("/")
     public ModelAndView index() {
@@ -36,16 +41,13 @@ public class PageController {
     public ModelAndView play(HttpServletRequest request, HttpServletResponse response, @PathVariable Long id) throws IOException {
         log.info("[/player/{}]", id);
 
-        // TODO: 2020-01-27 여기서 db에 접근하지 않고, api 서버서버로부터 데이터 받아 확인하기
-        // TODO: VTT 존재 여부, 비디오 존재 여부
-        Optional<Video> optionalVideo = videoRepository.findById(id);
+        Header<VideoInfoResponse> result = videoApiService.getInfo(id);
 
-        if (!optionalVideo.isPresent()) {
+        //존재하지 않음.
+        if(result.getStatus().equals("ERROR")){
             makePage(response);
             return null;
         }
-
-        addViewCount(optionalVideo.get());
 
         ModelAndView view = new ModelAndView("player");
         String host = "http://" + request.getHeader("Host").split(":")[0];
@@ -65,9 +67,4 @@ public class PageController {
         writer.flush();
     }
 
-    private void addViewCount(Video video) {
-        Long views = video.getViews() + 1;
-        video.setViews(views);
-        Video saved = videoRepository.save(video);
-    }
 }
