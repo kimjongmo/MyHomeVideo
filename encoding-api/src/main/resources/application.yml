@@ -1,0 +1,20 @@
+
+### FILE PATH ###
+home:
+  path: D:\\MyHomeVideo
+ffmpeg:
+  path: C:\\Users\\KIM\\Desktop\\ffmpeg-20191229-e20c6d9-win64-static\\ffmpeg-20191229-e20c6d9-win64-static\\bin
+server:
+  port: 8082
+
+### MQ Topic ###
+topic:
+  encode: my_encoder
+
+### Rabbit MQ ###
+spring:
+  rabbitmq:
+    host: localhost
+    username: guest
+    password: guest
+    port: 5672
