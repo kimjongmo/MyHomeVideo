@@ -1,6 +1,42 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: -1
+      max-request-size: -1
+  ## JPA ##
+  jpa:
+    hibernate:
+      ddl-auto: update
+  ## DATASOURCE ##
+  datasource:
+    url: jdbc:h2:~/data/video;AUTO_SERVER=true
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  ## JSON ##
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+  ### Rabbit MQ ###
+  rabbitmq:
+    host: localhost
+    username: guest
+    password: guest
+    port: 5672
+###
+
+### PORT ###
 server:
   port: 9091
 
+### External IP ###
 video:
   server:
     ip: http://192.168.35.239:9090
+
+### Path ###
+home:
+  path: D:\\MyHomeVideo
+
+### MQ TOPIC ###
+topic:
+  encode: my_encoder

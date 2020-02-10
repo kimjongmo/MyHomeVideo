@@ -2,6 +2,7 @@ package com.myhome.play.controller;
 
 import com.myhome.play.exceptions.CategoryNotFoundException;
 import com.myhome.play.exceptions.FileDuplicateException;
+import com.myhome.play.model.entity.Video;
 import com.myhome.play.model.network.Header;
 import com.myhome.play.model.network.request.video.VideoInsertRequest;
 import com.myhome.play.model.network.response.VideoListResponse;
@@ -106,26 +107,59 @@ public class VideoApiControllerTest {
     }
 
     @Test
-    public void get_info_with_valid_multi_request(){
+    public void get_info_with_valid_multi_request() {
 
     }
-    // TODO: 2020-01-09 404 Error나는 것 나중에 잡기
-//    @Test
-//    public void insert_with_duplicate_file() throws Exception {
-//        String fileName = "중복.mp4";
-//        given(videoApiService.insert(any())).willThrow(new FileDuplicateException(fileName));
-//
-//        VideoInsertRequest request = new VideoInsertRequest();
-//        request.setFileName(fileName);
-//        request.setTitle("중복입니다.");
-//        request.setCategoryName("카테고리");
-//
-//        mvc.perform(post("/video")
-//                .content(""))
-////                .content(JsonMapper.toJson(request)))
-//                .andExpect(status().isOk())
-//                .andExpect(content().string(containsString(fileName)))
-//                ;
-//    }
+
+    @Test
+    public void input_video_extension_avi() throws Exception {
+
+        VideoInsertRequest request = new VideoInsertRequest();
+        request.setTitle("제목");
+        request.setCategoryName("테스트");
+        request.setFileName("이름.avi");
+
+        given(videoApiService.insert(any())).willReturn(Video.builder().build());
+
+        mvc.perform(post("/video")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(JsonMapper.toJson(request)))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("SUCCESS")));
+    }
+
+    @Test
+    public void input_video_extension_mp4() throws Exception {
+
+        VideoInsertRequest request = new VideoInsertRequest();
+        request.setTitle("제목");
+        request.setCategoryName("테스트");
+        request.setFileName("이름.mp4");
+
+        given(videoApiService.insert(any())).willReturn(Video.builder().build());
+
+        mvc.perform(post("/video")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(JsonMapper.toJson(request)))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("SUCCESS")));
+    }
+    @Test
+    public void insert_with_duplicate_file() throws Exception {
+        String fileName = "중복.mp4";
+        given(videoApiService.insert(any())).willThrow(new FileDuplicateException(fileName));
+
+        VideoInsertRequest request = new VideoInsertRequest();
+        request.setFileName(fileName);
+        request.setTitle("중복입니다.");
+        request.setCategoryName("카테고리");
+
+        mvc.perform(post("/video")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(JsonMapper.toJson(request)))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString(fileName)))
+                ;
+    }
 
 }

@@ -7,6 +7,7 @@ import com.myhome.play.model.entity.Category;
 import com.myhome.play.model.network.Header;
 import com.myhome.play.repo.CategoryRepository;
 import com.myhome.play.serivce.FileUploadService;
+import com.myhome.play.serivce.MessageProducerService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -37,12 +38,14 @@ public class FileUploadServiceTest {
     private CategoryRepository categoryRepository;
     @Mock
     private RestTemplateService restTemplateService;
+    @Mock
+    private MessageProducerService messageProducerService;
 
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        fileUploadService = new FileUploadService(categoryRepository, restTemplateService);
+        fileUploadService = new FileUploadService(categoryRepository, restTemplateService,messageProducerService);
         ReflectionTestUtils.setField(fileUploadService, "ROOT_PATH", "D:/MyHomeVideo");
         ReflectionTestUtils.setField(fileUploadService, "videoServerIp", "http://192.168.35.239:9090");
     }
@@ -94,10 +97,16 @@ public class FileUploadServiceTest {
         List<MultipartFile> multipartFiles = new ArrayList<>();
         multipartFiles.add(new MockMultipartFile("file",
                 "filename.mp4",
-                "multipart/form-data",
+                "video/mp4",
+                "This is content about video".getBytes()));
+
+        multipartFiles.add(new MockMultipartFile("file",
+                "filename.avi",
+                "video/avi",
                 "This is content about video".getBytes()));
 
         List<String> titles = new ArrayList<>();
+        titles.add("테스트입니다.");
         titles.add("테스트입니다.");
 
         //GIVEN
@@ -151,5 +160,33 @@ public class FileUploadServiceTest {
         System.out.println(result);
         assertEquals(result.getStatus(), "OK");
         assertTrue(result.getDescription().contains("중복"));
+    }
+
+    @Test
+    public void rabbit_mq_message_send_test() throws IOException {
+        FileUploadService mockFileUploadService = Mockito.spy(fileUploadService);
+
+        //INPUT
+        Long categoryId = 1L;
+
+        List<MultipartFile> multipartFiles = new ArrayList<>();
+
+        multipartFiles.add(new MockMultipartFile("file",
+                "filename.avi",
+                "video/avi",
+                "This is content about video".getBytes()));
+
+        List<String> titles = new ArrayList<>();
+        titles.add("테스트입니다.");
+
+        //GIVEN
+        Category mockCategory = Category.builder().name("TEST").build();
+        given(categoryRepository.findById(categoryId)).willReturn(Optional.of(mockCategory));
+        doNothing().when(mockFileUploadService).validate(anyList(),anyLong(),anyList());
+        doNothing().when(mockFileUploadService).fileUpload(any(),anyString());
+        doNothing().when(messageProducerService).sendTo(anyString(),anyString());
+
+        mockFileUploadService.upload(multipartFiles,categoryId,titles);
+        verify(messageProducerService).sendTo(eq("TEST"),eq("filename.avi"));
     }
 }
