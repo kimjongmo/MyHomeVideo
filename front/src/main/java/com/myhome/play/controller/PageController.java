@@ -23,8 +23,6 @@ import java.util.Optional;
 public class PageController {
 
     @Autowired
-    private VideoRepository videoRepository;
-    @Autowired
     private VideoApiService videoApiService;
 
     @GetMapping("/")
