@@ -254,8 +254,9 @@
             },
             // // 완료 시
             complete: function (xhr) {
-                console.log(xhr.responseText);
-                alert(xhr.responseText);
+                var result = JSON.parse(xhr.responseText);
+                console.log(result);
+                alert(result.description);
                 window.location.reload();
             }
         });
