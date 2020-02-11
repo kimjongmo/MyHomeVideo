@@ -14,7 +14,7 @@ import javax.validation.constraints.Pattern;
 public class VideoInsertRequest {
 
     @NotEmpty(message = "파일을 선택하세요")
-    @Pattern(regexp = "^([\\S]+((\\.(?i)(mp4))|(\\.(?i)(avi)))$)",message = "지원하지 않는 확장자입니다.")
+    @Pattern(regexp = "^([\\S|\\s]+((\\.(?i)(mp4|avi)))$)",message = "지원하지 않는 확장자입니다.")
     @JsonProperty("file_name")
     private String fileName;
 

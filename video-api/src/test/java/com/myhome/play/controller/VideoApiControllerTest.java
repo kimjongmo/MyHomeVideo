@@ -162,4 +162,20 @@ public class VideoApiControllerTest {
                 ;
     }
 
+    @Test
+    public void input_video_title_regular_expression_test() throws Exception {
+
+        VideoInsertRequest request = new VideoInsertRequest();
+        request.setTitle("제목.1124.231489123.coffee.mp4");
+        request.setCategoryName("테스트");
+        request.setFileName("제목.av.231489123 coffee.mp4");
+
+        given(videoApiService.insert(any())).willReturn(Video.builder().build());
+
+        mvc.perform(post("/video")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(JsonMapper.toJson(request)))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("SUCCESS")));
+    }
 }
