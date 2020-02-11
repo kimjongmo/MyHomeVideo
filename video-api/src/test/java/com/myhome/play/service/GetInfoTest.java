@@ -22,6 +22,10 @@ public class GetInfoTest {
     @Autowired
     private VideoRepository videoRepository;
 
+    @Test
+    public void context(){
+
+    }
 //    @Test
     public void multi_request_get_info_test(){
 

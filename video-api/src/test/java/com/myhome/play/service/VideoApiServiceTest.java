@@ -114,9 +114,10 @@ public class VideoApiServiceTest {
 
         Video video = Video.builder().build();
         video.setId(id);
+        video.setViews(0L);
         video.setCategory(Category.builder().name("테스트").build());
 
-        given(videoRepository.findById(id)).willReturn(Optional.of(video));
+        given(videoRepository.findByIdForUpdate(id)).willReturn(Optional.of(video));
 
         Header<VideoInfoResponse> header = videoApiService.getInfo(id);
 
@@ -147,7 +148,7 @@ public class VideoApiServiceTest {
         Video video = Video.builder().views(0L).category(Category.builder().name("테스트").build()).build();
         video.setId(id);
 
-        given(videoRepository.findById(id)).willReturn(Optional.of(video));
+        given(videoRepository.findByIdForUpdate(id)).willReturn(Optional.of(video));
         given(videoRepository.save(any())).will(invocation -> {
             return invocation.getArgument(0);
         });

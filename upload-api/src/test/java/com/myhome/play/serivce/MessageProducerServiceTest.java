@@ -16,6 +16,10 @@ public class MessageProducerServiceTest {
     private MessageProducerService messageProducerService;
 
     @Test
+    public void context(){
+
+    }
+//    @Test
     public void send_to_message_test(){
         for(int i=0;i<5;i++)
             messageProducerService.sendTo("TEST","test.avi");

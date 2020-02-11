@@ -57,7 +57,7 @@ public class RegisterApiControllerTest {
                 .content("{\"file_name\":\"534.jpg\",\"title\":\"제목\",\"category_name\":\"카테고리\"}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(containsString("\"field\":\"fileName\"")))
-                .andExpect(content().string(containsString("mp4확장자만 업로드 가능합니다")))
+                .andExpect(content().string(containsString("지원하지 않는")))
         ;
     }
 

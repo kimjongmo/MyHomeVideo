@@ -1,7 +1,8 @@
 package com.myhome.play.controller;
 
-import com.myhome.play.model.entity.Video;
-import com.myhome.play.repo.VideoRepository;
+import com.myhome.play.model.network.Header;
+import com.myhome.play.model.network.response.video.VideoInfoResponse;
+import com.myhome.play.service.VideoApiService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,14 +11,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Optional;
-
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.head;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
@@ -28,7 +24,7 @@ public class PageControllerTest {
     private MockMvc mvc;
 
     @MockBean
-    private VideoRepository videoRepository;
+    private VideoApiService videoApiService;
 
     @Test
     public void getIndexPage() throws Exception {
@@ -65,8 +61,7 @@ public class PageControllerTest {
 
     @Test
     public void getPlayerPageWithInValidData() throws Exception {
-        given(videoRepository.findById(123L)).willReturn(Optional.empty());
-
+        given(videoApiService.getInfo(123L)).willReturn(Header.ERROR(""));
         mvc.perform(get("/player/123").header("Host","192.168.35.123"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("<script>")));
@@ -74,10 +69,8 @@ public class PageControllerTest {
 
     @Test
     public void getPlayerPageWithValidData() throws Exception {
-        Video video = Video.builder().views(1L).build();
-        given(videoRepository.findById(123L)).willReturn(Optional.of(video));
-        given(videoRepository.save(any())).willReturn(video);
-
+        VideoInfoResponse response = new VideoInfoResponse();
+        given(videoApiService.getInfo(123L)).willReturn(Header.OK(response));
         mvc.perform(get("/player/123").header("Host","192.168.35.123"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("<title>즐거운 감상하세요.</title>")))
