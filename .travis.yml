@@ -12,7 +12,9 @@ cache:
     - '$HOME/.m2/repository'
     - '$HOME/.gradle'
 
-script: "./gradlew clean test"
+script:
+  - chmod +x ./gradlew
+  - ./gradlew clean test
 
 notifications:
   email:
