@@ -47,7 +47,7 @@ public class VideoApiController {
     public void play(HttpServletRequest req,
                      HttpServletResponse res,
                      @PathVariable Long id) throws IOException, ServletException {
-        log.info("[GET /video/{}]",id);
+//        log.info("[GET /video/{}]",id);
         videoApiService.play(req, res, id);
     }
 
