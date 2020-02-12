@@ -1,0 +1,20 @@
+language: java
+jdk:
+  - openjdk8
+
+branches:
+  only:
+    - master
+
+# gradle 통해서 의존성을 받을 때, 같은 의존성은 다시 받지 않도록 캐시
+cache:
+  directories:
+    - '$HOME/.m2/repository'
+    - '$HOME/.gradle'
+
+script: "./gradlew clean test"
+
+notifications:
+  email:
+    recipients:
+      - kfmd1008@naver.com
