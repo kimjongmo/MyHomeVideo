@@ -20,8 +20,8 @@ public class MessageProducerService {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public void sendTo(String category, String name){
-        EncodeRequestDTO request = EncodeRequestDTO.builder().category(category).name(name).build();
+    public void sendTo(String category, String name, String title){
+        EncodeRequestDTO request = EncodeRequestDTO.builder().title(title).category(category).name(name).build();
         log.info("전송>>...");
         rabbitTemplate.convertAndSend(topic, JsonMapper.toJson(request));
     }

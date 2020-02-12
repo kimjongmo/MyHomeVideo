@@ -11,4 +11,5 @@ import lombok.*;
 public class EncodeRequestDTO {
     private String name;
     private String category;
+    private String title;
 }

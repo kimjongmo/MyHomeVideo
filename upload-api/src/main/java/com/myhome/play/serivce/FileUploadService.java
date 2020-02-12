@@ -68,10 +68,14 @@ public class FileUploadService {
 
             try {
                 fileUpload(file, path);
+
+                //확장자가 avi인 경우 인코딩 서버에 요청
                 if(ext.equals("avi")){
-                    messageProducerService.sendTo(categoryName,file.getOriginalFilename());
+                    success.append("\n" + file.getOriginalFilename() + "가 등록되었습니다.");
+                    messageProducerService.sendTo(categoryName,file.getOriginalFilename(),titles.get(i));
                     continue;
                 }
+
                 Header result = insert(makeRequestData(categoryName, titles.get(i), file.getOriginalFilename()));
                 if (result.getDescription().equals("SUCCESS")) {
                     success.append("\n" + file.getOriginalFilename() + "가 등록되었습니다.");

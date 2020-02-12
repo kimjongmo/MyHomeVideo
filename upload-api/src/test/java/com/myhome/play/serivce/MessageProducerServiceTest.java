@@ -6,8 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.junit.Assert.*;
-
 @SpringBootTest
 @RunWith(SpringRunner.class)
 public class MessageProducerServiceTest {
@@ -22,6 +20,6 @@ public class MessageProducerServiceTest {
 //    @Test
     public void send_to_message_test(){
         for(int i=0;i<5;i++)
-            messageProducerService.sendTo("TEST","test.avi");
+            messageProducerService.sendTo("TEST","test.avi","제목");
     }
 }
