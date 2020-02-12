@@ -184,9 +184,9 @@ public class FileUploadServiceTest {
         given(categoryRepository.findById(categoryId)).willReturn(Optional.of(mockCategory));
         doNothing().when(mockFileUploadService).validate(anyList(),anyLong(),anyList());
         doNothing().when(mockFileUploadService).fileUpload(any(),anyString());
-        doNothing().when(messageProducerService).sendTo(anyString(),anyString(), );
+        doNothing().when(messageProducerService).sendTo(anyString(),anyString(),anyString() );
 
         mockFileUploadService.upload(multipartFiles,categoryId,titles);
-        verify(messageProducerService).sendTo(eq("TEST"),eq("filename.avi"), );
+        verify(messageProducerService).sendTo(eq("TEST"),eq("filename.avi"), anyString());
     }
 }
