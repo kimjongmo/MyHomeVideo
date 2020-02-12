@@ -18,3 +18,8 @@ spring:
     username: guest
     password: guest
     port: 5672
+
+### IP ###
+video:
+  server:
+    ip: http://localhost:9090
