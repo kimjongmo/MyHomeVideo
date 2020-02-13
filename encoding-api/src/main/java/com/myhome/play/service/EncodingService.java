@@ -1,5 +1,6 @@
 package com.myhome.play.service;
 
+import com.myhome.play.domain.EncodingHistory;
 import com.myhome.play.enums.EncodingResult;
 import com.myhome.play.model.network.Header;
 import com.myhome.play.model.network.request.encode.EncodeRequestDTO;
@@ -15,6 +16,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.*;
 import java.net.URI;
+import java.time.LocalDateTime;
 
 @Service
 @Slf4j
@@ -30,8 +32,11 @@ public class EncodingService {
     public String videoServerIp;
 
     private RestTemplateService restTemplateService;
+    private EncodingHistoryService encodingHistoryService;
 
-    public EncodingService(RestTemplateService restTemplateService) {
+    public EncodingService(RestTemplateService restTemplateService,
+                           EncodingHistoryService encodingHistoryService) {
+        this.encodingHistoryService = encodingHistoryService;
         this.restTemplateService = restTemplateService;
     }
 
@@ -42,24 +47,31 @@ public class EncodingService {
      * @author kimjongmo
      */
     public EncodingResult encodingToMPEG4(EncodeRequestDTO requestDTO) {
-
         //Validate Input
-        if (!validate(requestDTO))
-            return EncodingResult.INPUT_ERROR;
+        if (!validate(requestDTO)) return EncodingResult.INPUT_ERROR;
 
         File file = getFile(requestDTO.getCategory(), requestDTO.getName());
 
         //file is not existed
-        if (file == null)
-            return EncodingResult.INPUT_ERROR;
+        if (file == null) return EncodingResult.INPUT_ERROR;
 
         String sourcePath = file.getAbsolutePath();//인코딩할 파일의 절대경로
         String targetPath = removeExt(file) + ".mp4"; //인코딩 된 파일의 목적 경로
 
         //비디오 인코딩
         boolean isSuccess = encodingVideo(sourcePath, targetPath);
-        if (!isSuccess)
+
+        //인코딩 히스토리
+        EncodingHistory history = EncodingHistory.builder()
+                        .fileName(file.getName())
+                        .fileSize(Math.round((file.length() / 1000000.0) * 10) / 10.0 + "MB")
+                        .startAt(LocalDateTime.now())
+                        .build();
+
+        if (!isSuccess) {
+            historySave(history,EncodingResult.ERROR);
             return EncodingResult.ERROR;
+        }
 
         // VideoInsertRequest 객체를 생성 후 video 서버에 전달.
         Header header
@@ -69,12 +81,20 @@ public class EncodingService {
         fileDelete(requestDTO.getName(), requestDTO.getCategory());
 
         if (header.getDescription().equals("SUCCESS")) {
+            historySave(history,EncodingResult.OK);
             return EncodingResult.OK;
         }
 
         //메타데이터 등록 실패 시
         fileDelete(file.getName(), requestDTO.getCategory());
+        historySave(history,EncodingResult.SAVE_META_DATA_FAIL);
         return EncodingResult.SAVE_META_DATA_FAIL;
+    }
+
+    public EncodingHistory historySave(EncodingHistory history, EncodingResult result){
+        history.setEndAt(LocalDateTime.now());
+        history.setEncodingResult(result);
+        return encodingHistoryService.save(history);
     }
 
     //파일을 가져온다.
@@ -209,4 +229,5 @@ public class EncodingService {
             return false;
         }
     }
+
 }

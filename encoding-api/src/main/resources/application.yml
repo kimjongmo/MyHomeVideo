@@ -1,3 +1,20 @@
+spring:
+  ## JPA ##
+  jpa:
+    hibernate:
+      ddl-auto: update
+  ## DATASOURCE ##
+  datasource:
+    url: jdbc:h2:~/data/video;AUTO_SERVER=true
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  ### Rabbit MQ ###
+  rabbitmq:
+    host: localhost
+    username: guest
+    password: guest
+    port: 5672
 
 ### FILE PATH ###
 home:
@@ -10,14 +27,6 @@ server:
 ### MQ Topic ###
 topic:
   encode: my_encoder
-
-### Rabbit MQ ###
-spring:
-  rabbitmq:
-    host: localhost
-    username: guest
-    password: guest
-    port: 5672
 
 ### IP ###
 video:

@@ -1,6 +1,7 @@
 package com.myhome.play.service;
 
 
+import com.myhome.play.domain.EncodingHistory;
 import com.myhome.play.enums.EncodingResult;
 import com.myhome.play.model.network.Header;
 import com.myhome.play.model.network.request.encode.EncodeRequestDTO;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.File;
+import java.time.LocalDateTime;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -25,11 +27,12 @@ public class EncodingServiceTest {
 
     @Mock
     private RestTemplateService restTemplateService;
-
+    @Mock
+    private EncodingHistoryService encodingHistoryService;
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        encodingService = new EncodingService(restTemplateService);
+        encodingService = new EncodingService(restTemplateService,encodingHistoryService);
         ReflectionTestUtils.setField(encodingService, "HOME_PATH", "D:/MyHomeVideo");
         ReflectionTestUtils.setField(encodingService, "FFMPEG_PATH", "C:\\Users\\KIM\\Desktop\\ffmpeg-20191229-e20c6d9-win64-static\\ffmpeg-20191229-e20c6d9-win64-static\\bin");
         ReflectionTestUtils.setField(encodingService, "videoServerIp", "http://localhost:9090");
@@ -66,6 +69,8 @@ public class EncodingServiceTest {
 
         //THEN
         assertEquals(result,EncodingResult.INPUT_ERROR);
+
+        verify(encodingHistoryService,never()).save(any());
     }
 
 
@@ -88,6 +93,8 @@ public class EncodingServiceTest {
         result = encodingService.encodingToMPEG4(
                 EncodeRequestDTO.builder().category("").build());
         assertTrue(result.equals(EncodingResult.INPUT_ERROR));
+
+        verify(encodingHistoryService,never()).save(any());
     }
 
     @Test
@@ -105,11 +112,11 @@ public class EncodingServiceTest {
         File mockFile = mock(File.class);
 
         doReturn(mockFile).when(mockEncodingService).getFile(anyString(), anyString());
-        given(mockFile.getAbsolutePath()).willReturn("D:/MyHomeVideo/TEST/테스트.avi");
         doReturn(true).when(mockEncodingService).encodingVideo(anyString(), anyString());
-        given(restTemplateService.exchange(any(), eq(HttpMethod.POST), any(), any())).willReturn(Header.MESSAGE("SUCCESS"));
         doReturn(true).when(mockEncodingService).fileDelete(anyString(), anyString());
-
+        given(mockFile.getAbsolutePath()).willReturn("D:/MyHomeVideo/TEST/테스트.avi");
+        given(restTemplateService.exchange(any(), eq(HttpMethod.POST), any(), any())).willReturn(Header.MESSAGE("SUCCESS"));
+        given(encodingHistoryService.save(any())).willReturn(null);
         //WHEN
         EncodingResult result = mockEncodingService.encodingToMPEG4(dto);
 
@@ -117,6 +124,7 @@ public class EncodingServiceTest {
         assertEquals(result, EncodingResult.OK);
         verify(mockEncodingService).insert(any());
         verify(mockEncodingService).fileDelete(eq("테스트.avi"), eq("TEST"));
+        verify(encodingHistoryService).save(any());
     }
 
     @Test
@@ -134,10 +142,11 @@ public class EncodingServiceTest {
         File mockFile = mock(File.class);
         doReturn("테스트.mp4").when(mockFile).getName();
         doReturn(mockFile).when(mockEncodingService).getFile(anyString(), anyString());
-        given(mockFile.getAbsolutePath()).willReturn("D:/MyHomeVideo/TEST/테스트.avi");
         doReturn(true).when(mockEncodingService).encodingVideo(anyString(), anyString());
-        given(restTemplateService.exchange(any(), eq(HttpMethod.POST), any(), any())).willReturn(Header.ERROR("FAIL"));
         doReturn(true).when(mockEncodingService).fileDelete(anyString(), anyString());
+        given(mockFile.getAbsolutePath()).willReturn("D:/MyHomeVideo/TEST/테스트.avi");
+        given(restTemplateService.exchange(any(), eq(HttpMethod.POST), any(), any())).willReturn(Header.ERROR("FAIL"));
+        given(encodingHistoryService.save(any())).willReturn(null);
         //WHEN
         EncodingResult result = mockEncodingService.encodingToMPEG4(dto);
 
@@ -146,6 +155,7 @@ public class EncodingServiceTest {
         verify(mockEncodingService).insert(any());
         verify(mockEncodingService).fileDelete(eq("테스트.avi"), eq("TEST"));
         verify(mockEncodingService).fileDelete(eq("테스트.mp4"), eq("TEST"));
+        verify(encodingHistoryService).save(any());
     }
 
 }
