@@ -7,6 +7,7 @@ import com.myhome.play.model.network.Header;
 import com.myhome.play.model.network.request.video.VideoInsertRequest;
 import com.myhome.play.repo.CategoryRepository;
 import com.myhome.play.service.RestTemplateService;
+import com.myhome.play.utils.FileUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -24,21 +25,22 @@ import java.util.List;
 @Slf4j
 public class FileUploadService {
 
-    @Value("${home.path}")
-    public String ROOT_PATH;
     @Value("${video.server.ip}")
     private String videoServerIp;
 
     private CategoryRepository categoryRepository;
     private RestTemplateService restTemplateService;
     private MessageProducerService messageProducerService;
+    private FileUtils fileUtils;
 
     public FileUploadService(CategoryRepository categoryRepository,
                              RestTemplateService restTemplateService,
-                             MessageProducerService messageProducerService) {
+                             MessageProducerService messageProducerService,
+                             FileUtils fileUtils) {
         this.categoryRepository = categoryRepository;
         this.restTemplateService = restTemplateService;
         this.messageProducerService = messageProducerService;
+        this.fileUtils = fileUtils;
     }
 
     public void validate(List<MultipartFile> multipartFiles, Long categoryId, List<String> titles) {
@@ -53,7 +55,6 @@ public class FileUploadService {
         validate(multipartFiles, categoryId, titles);
 
         String categoryName = categoryRepository.findById(categoryId).get().getName();
-        String path = ROOT_PATH + "/" + categoryName;
 
         StringBuilder success = new StringBuilder("-----------success list---------------");
         StringBuilder fail = new StringBuilder("-----------fail list ---------------");
@@ -62,17 +63,17 @@ public class FileUploadService {
         for (int i = 0; i < length; i++) {
 
             MultipartFile file = multipartFiles.get(i);
-            String ext = file.getContentType().substring(file.getContentType().lastIndexOf("/")+1);
+            String ext = file.getContentType().substring(file.getContentType().lastIndexOf("/") + 1);
 
-            log.info("등록 중... =>file-type : {},name : {}, size : {},ext : {}", file.getContentType(), file.getOriginalFilename(), file.getSize(),ext);
+            log.info("등록 중... =>file-type : {},name : {}, size : {},ext : {}", file.getContentType(), file.getOriginalFilename(), file.getSize(), ext);
 
             try {
-                fileUpload(file, path);
+                fileUpload(file, categoryName);
 
                 //확장자가 avi인 경우 인코딩 서버에 요청
-                if(ext.equals("avi")){
+                if (ext.equals("avi")) {
                     success.append("\n" + file.getOriginalFilename() + "가 등록되었습니다.");
-                    messageProducerService.sendTo(categoryName,file.getOriginalFilename(),titles.get(i));
+                    messageProducerService.sendTo(categoryName, file.getOriginalFilename(), titles.get(i));
                     continue;
                 }
 
@@ -81,7 +82,7 @@ public class FileUploadService {
                     success.append("\n" + file.getOriginalFilename() + "가 등록되었습니다.");
                     log.info("--데이터 메타데이터 등록 성공--");
                 } else {
-                    boolean isDeleted = fileDelete(file.getOriginalFilename(), path);
+                    boolean isDeleted = fileUtils.delete(categoryName, file.getOriginalFilename());
                     fail.append("비디오 서버 연결 오류");
                     log.info("---비디오 메타데이터 등록 실패: {}, 파일 삭제 여부 : {}", result.getDescription(), isDeleted);
                 }
@@ -97,22 +98,23 @@ public class FileUploadService {
     }
 
 
-
     /**
      * HOME_PATH + path 경로에 파일을 저장한다.
+     *
      * @param multipartFile 저장할 파일
-     * @param path 카테고리명
-     * @exception FileNotFoundException
-     * */
-    public void fileUpload(MultipartFile multipartFile, String path) throws IOException {
-        File uploadFile = new File(path + "/" + multipartFile.getOriginalFilename());
+     * @param category 카테고리명
+     * @throws FileNotFoundException
+     */
+    public void fileUpload(MultipartFile multipartFile, String category) throws IOException {
+
+        boolean isCreated = fileUtils.create(category, multipartFile.getOriginalFilename());
 
         //기존에 존재하는 파일인 경우 예외를 던진다
-        if (uploadFile.exists()) {
+        if (!isCreated)
             throw new FileDuplicateException();
-        }
+
         //파일 생성
-        uploadFile.createNewFile();
+        File uploadFile = fileUtils.getFile(category, multipartFile.getOriginalFilename());
 
         //데이터 복사
         try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(uploadFile));
@@ -130,11 +132,12 @@ public class FileUploadService {
 
     /**
      * VideoInsertRequest 객체를 만든다.
+     *
      * @param categoryName 카테고리 이름
-     * @param title 비디오 제목
-     * @param fileName 파일 이름 (확장자가 포함되어야 한다)
+     * @param title        비디오 제목
+     * @param fileName     파일 이름 (확장자가 포함되어야 한다)
      * @return 인자값을 이용하여 만들어진 VideoInsertRequest 객체
-     * */
+     */
     private VideoInsertRequest makeRequestData(String categoryName, String title, String fileName) {
         VideoInsertRequest requestData = new VideoInsertRequest();
         requestData.setCategoryName(categoryName);
@@ -145,7 +148,7 @@ public class FileUploadService {
 
     /**
      * 비디오 메타 정보를 VIDEO_API 서버에 전송
-     * */
+     */
     public Header insert(VideoInsertRequest request) {
         URI uri = UriComponentsBuilder
                 .fromHttpUrl(videoServerIp)
@@ -158,19 +161,11 @@ public class FileUploadService {
 
         try {
             return restTemplateService.exchange(uri, HttpMethod.POST, request, type);
-        }catch (ResourceAccessException e){
+        } catch (ResourceAccessException e) {
             return Header.ERROR("VIDEO 서버와 연결이 되지 않습니다.");
-        }catch (Exception ex){
-            log.info("[FileUploadService] error = {}",ex);
+        } catch (Exception ex) {
+            log.info("[FileUploadService] error = {}", ex);
             return Header.ERROR("알 수 없는 오류...");
         }
-    }
-
-    private boolean fileDelete(String name, String path) {
-        File file = new File(path + "/" + name);
-        if (file.exists()) {
-            return file.delete();
-        }
-        return true;
     }
 }

@@ -11,6 +11,7 @@ import com.myhome.play.model.network.response.VideoListResponse;
 import com.myhome.play.model.network.response.video.VideoInfoResponse;
 import com.myhome.play.repo.CategoryRepository;
 import com.myhome.play.repo.VideoRepository;
+import com.myhome.play.utils.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -42,12 +43,13 @@ public class VideoApiServiceTest {
     private MyResourceHttpRequestHandler handler;
     @Mock
     private ThumbnailService thumbnailService;
+    @Mock
+    private FileUtils fileUtils;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        videoApiService = new VideoApiService(videoRepository, categoryRepository, handler, thumbnailService);
-        ReflectionTestUtils.setField(videoApiService, "HOME_PATH", "D:/MyHomeVideo");
+        videoApiService = new VideoApiService(videoRepository, categoryRepository, handler, thumbnailService, fileUtils);
     }
 
     @Test(expected = CategoryNotFoundException.class)

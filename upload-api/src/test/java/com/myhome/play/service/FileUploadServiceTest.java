@@ -8,6 +8,7 @@ import com.myhome.play.model.network.Header;
 import com.myhome.play.repo.CategoryRepository;
 import com.myhome.play.serivce.FileUploadService;
 import com.myhome.play.serivce.MessageProducerService;
+import com.myhome.play.utils.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -40,17 +41,18 @@ public class FileUploadServiceTest {
     private RestTemplateService restTemplateService;
     @Mock
     private MessageProducerService messageProducerService;
-
+    @Mock
+    private FileUtils fileUtils;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        fileUploadService = new FileUploadService(categoryRepository, restTemplateService,messageProducerService);
-        ReflectionTestUtils.setField(fileUploadService, "ROOT_PATH", "D:/MyHomeVideo");
+        fileUploadService = new FileUploadService(categoryRepository, restTemplateService,messageProducerService,fileUtils);
         ReflectionTestUtils.setField(fileUploadService, "videoServerIp", "http://192.168.35.239:9090");
     }
 
     @Test(expected = DataSizeNotMatchException.class)
+    //파일의 수와 제목의 수가 다를 때
     public void validate_test_with_data_size_not_match() {
 
         given(categoryRepository.findById(1L)).willReturn(Optional.of(Category.builder().build()));
@@ -74,6 +76,7 @@ public class FileUploadServiceTest {
 
     }
 
+    // 존재하지 않는 카테고리일 때
     @Test(expected = CategoryNotFoundException.class)
     public void validate_test_with_not_existed_category() {
 
@@ -87,6 +90,7 @@ public class FileUploadServiceTest {
 
 
     @Test
+    //업로드 성공 케이스
     public void upload_success_test() throws IOException {
 
         FileUploadService mockFileUploadService = Mockito.spy(fileUploadService);
@@ -129,6 +133,7 @@ public class FileUploadServiceTest {
     }
 
     @Test
+    //기존에 등록되어 있는 파일일 때
     public void upload_fail_with_duplicate() throws IOException {
         FileUploadService mockFileUploadService = Mockito.spy(fileUploadService);
 
@@ -148,12 +153,7 @@ public class FileUploadServiceTest {
         //GIVEN
         given(categoryRepository.findById(categoryId))
                 .willReturn(Optional.of(Category.builder().name("테스트").build()));
-
-
-        doThrow(new FileDuplicateException())
-                .doNothing()
-                .when(mockFileUploadService)
-                .fileUpload(any(), anyString());
+        given(fileUtils.create(anyString(),anyString())).willReturn(false);
 
         //WHEN
         Header result = mockFileUploadService.upload(multipartFiles, 1L, titles);
@@ -163,6 +163,7 @@ public class FileUploadServiceTest {
     }
 
     @Test
+    // 파일이 avi 일 때 MQ로 메시지를 전송하는지
     public void rabbit_mq_message_send_test() throws IOException {
         FileUploadService mockFileUploadService = Mockito.spy(fileUploadService);
 

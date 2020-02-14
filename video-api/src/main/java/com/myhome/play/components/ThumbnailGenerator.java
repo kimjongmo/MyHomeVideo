@@ -33,7 +33,7 @@ public class ThumbnailGenerator {
 
     //동영상에서 이미지를 추출하여 섬네일을 만드는 메서드
     // 원본 소스 : https://javacan.tistory.com/tag/%EC%8D%B8%EB%84%A4%EC%9D%BC%EC%B6%94%EC%B6%9C
-    public void extractImage(File videoFile, int position, File creatingImageFile) {
+    public void extractImage(File videoFile, int position, File creatingImageFile){
         if (isThumbnailExisted(creatingImageFile.getName()))
             return;
 

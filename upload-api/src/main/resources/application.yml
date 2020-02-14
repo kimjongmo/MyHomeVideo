@@ -33,10 +33,6 @@ video:
   server:
     ip: http://192.168.35.239:9090
 
-### Path ###
-home:
-  path: D:\\MyHomeVideo
-
 ### MQ TOPIC ###
 topic:
   encode: my_encoder

@@ -2,7 +2,6 @@ package com.myhome.play.service;
 
 import com.myhome.play.components.MyResourceHttpRequestHandler;
 import com.myhome.play.exceptions.CategoryNotFoundException;
-import com.myhome.play.exceptions.FileDuplicateException;
 import com.myhome.play.model.entity.Category;
 import com.myhome.play.model.entity.Video;
 import com.myhome.play.model.network.Header;
@@ -11,23 +10,19 @@ import com.myhome.play.model.network.response.VideoListResponse;
 import com.myhome.play.model.network.response.video.VideoInfoResponse;
 import com.myhome.play.repo.CategoryRepository;
 import com.myhome.play.repo.VideoRepository;
+import com.myhome.play.utils.FileUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -36,21 +31,22 @@ import java.util.stream.Collectors;
 @Slf4j
 public class VideoApiService {
 
-    @Value("${home.path}")
-    public String HOME_PATH;
     private VideoRepository videoRepository;
     private CategoryRepository categoryRepository;
     private MyResourceHttpRequestHandler handler;
     private ThumbnailService thumbnailService;
+    private FileUtils fileUtils;
 
     public VideoApiService(VideoRepository videoRepository,
                            CategoryRepository categoryRepository,
                            MyResourceHttpRequestHandler handler,
-                           ThumbnailService thumbnailService) {
+                           ThumbnailService thumbnailService,
+                           FileUtils fileUtils) {
         this.videoRepository = videoRepository;
         this.categoryRepository = categoryRepository;
         this.handler = handler;
         this.thumbnailService = thumbnailService;
+        this.fileUtils = fileUtils;
     }
 
 
@@ -71,16 +67,16 @@ public class VideoApiService {
     }
 
     public Header<List<VideoListResponse>> getRecentRegistered(String categoryName) {
-        if(Strings.isEmpty(categoryName)) {
+        if (Strings.isEmpty(categoryName)) {
             List<Video> list = videoRepository.findTop5ByOrderByCreatedAtDesc();
             return Header.OK(
                     list.stream()
                             .map(this::response)
                             .collect(Collectors.toList())
             );
-        }else{
+        } else {
             Optional<Category> optionalCategory = categoryRepository.findByName(categoryName);
-            if(optionalCategory.isPresent()){
+            if (optionalCategory.isPresent()) {
                 Category category = optionalCategory.get();
                 return Header.OK(videoRepository.findTop5ByCategoryOrderByCreatedAtDesc(category)
                         .stream().map(this::response).collect(Collectors.toList()));
@@ -93,14 +89,19 @@ public class VideoApiService {
 
     public void play(HttpServletRequest req, HttpServletResponse res, Long id) throws ServletException, IOException {
         Optional<Video> optionalVideo = videoRepository.findById(id);
+
         if (!optionalVideo.isPresent()) {
-            PrintWriter writer = res.getWriter();
-            writer.print("<script>alert('존재하지 않는 비디오입니다');history.back();</script>");
-            writer.flush();
+            insertScript(res);
+            return;
         }
+
         Video video = optionalVideo.get();
 
-        File file = new File(HOME_PATH + "/" + video.getCategory().getDirectoryPath() + "/" + video.getFileName());
+        File file = fileUtils.getFile(video.getCategory().getName(), video.getFileName());
+        if (file.exists()) {
+            insertScript(res);
+            return;
+        }
         req.setAttribute("file", file);
         handler.handleRequest(req, res);
 
@@ -125,12 +126,8 @@ public class VideoApiService {
                 .build();
 
         // TODO: 2020-02-04 썸네일 생성을 비동기로 생성하는 방식으로 바꾸기
-        try {
-            thumbnailService.create(new File(HOME_PATH + "/" + data.getCategoryName() + "/" + data.getFileName()));
-        } catch (FileNotFoundException e) {
-            log.error("썸네일 생성 실패: {}",HOME_PATH + "/" + data.getCategoryName() + "/" + data.getFileName());
-        }
-
+        boolean result = thumbnailService.create(fileUtils.getFile(data.getCategoryName(), data.getFileName()));
+        log.info("{} 썸네일 생성 : {}",video.getFileName(),result);
         return videoRepository.save(video);
     }
 
@@ -143,16 +140,17 @@ public class VideoApiService {
                 .description(video.getFileName())
                 .build();
     }
+
     @Transactional
     public Header<VideoInfoResponse> getInfo(Long id) {
 
         Optional<Video> optionalVideo = videoRepository.findByIdForUpdate(id);
-        if(!optionalVideo.isPresent()){
+        if (!optionalVideo.isPresent()) {
             return Header.ERROR("존재하지 않는 데이터");
         }
 
         Video video = optionalVideo.get();
-        video.setViews(video.getViews()+1);
+        video.setViews(video.getViews() + 1);
         videoRepository.save(video);
 
 
@@ -166,5 +164,11 @@ public class VideoApiService {
                 .build();
 
         return Header.OK(videoInfoResponse);
+    }
+
+    public void insertScript(HttpServletResponse response) throws IOException {
+        PrintWriter writer = response.getWriter();
+        writer.print("<script>alert('존재하지 않는 비디오입니다');history.back();</script>");
+        writer.flush();
     }
 }

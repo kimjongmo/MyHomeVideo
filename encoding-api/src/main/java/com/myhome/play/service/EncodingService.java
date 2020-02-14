@@ -5,6 +5,7 @@ import com.myhome.play.enums.EncodingResult;
 import com.myhome.play.model.network.Header;
 import com.myhome.play.model.network.request.encode.EncodeRequestDTO;
 import com.myhome.play.model.network.request.video.VideoInsertRequest;
+import com.myhome.play.utils.FileUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,19 +26,19 @@ public class EncodingService {
     @Value("${ffmpeg.path}")
     public String FFMPEG_PATH;
 
-    @Value("${home.path}")
-    public String HOME_PATH;
-
     @Value("${video.server.ip}")
     public String videoServerIp;
 
     private RestTemplateService restTemplateService;
     private EncodingHistoryService encodingHistoryService;
+    private FileUtils fileUtils;
 
     public EncodingService(RestTemplateService restTemplateService,
-                           EncodingHistoryService encodingHistoryService) {
+                           EncodingHistoryService encodingHistoryService,
+                           FileUtils fileUtils) {
         this.encodingHistoryService = encodingHistoryService;
         this.restTemplateService = restTemplateService;
+        this.fileUtils = fileUtils;
     }
 
     /**
@@ -50,35 +51,37 @@ public class EncodingService {
         //Validate Input
         if (!validate(requestDTO)) return EncodingResult.INPUT_ERROR;
 
-        File file = getFile(requestDTO.getCategory(), requestDTO.getName());
+        File file = fileUtils.getFile(requestDTO.getCategory(), requestDTO.getName());
 
         //file is not existed
-        if (file == null) return EncodingResult.INPUT_ERROR;
+        if(!file.exists()) return EncodingResult.INPUT_ERROR;
+
+        //인코딩 히스토리
+        EncodingHistory history = EncodingHistory.builder()
+                .fileName(file.getName())
+                .fileSize(Math.round((file.length() / 1000000.0) * 10) / 10.0 + "MB")
+                .startAt(LocalDateTime.now())
+                .build();
 
         String sourcePath = file.getAbsolutePath();//인코딩할 파일의 절대경로
-        String targetPath = removeExt(file) + ".mp4"; //인코딩 된 파일의 목적 경로
+        String targetPath = fileUtils.getPureName(file.getAbsolutePath())+ ".mp4"; //인코딩 된 파일의 목적 경로
 
         //비디오 인코딩
         boolean isSuccess = encodingVideo(sourcePath, targetPath);
 
-        //인코딩 히스토리
-        EncodingHistory history = EncodingHistory.builder()
-                        .fileName(file.getName())
-                        .fileSize(Math.round((file.length() / 1000000.0) * 10) / 10.0 + "MB")
-                        .startAt(LocalDateTime.now())
-                        .build();
 
         if (!isSuccess) {
             historySave(history,EncodingResult.ERROR);
             return EncodingResult.ERROR;
         }
 
+        // TODO: 2020-02-13 file.getName()하면 avi 확장자 명이 나옴. 고칠 것. 
         // VideoInsertRequest 객체를 생성 후 video 서버에 전달.
         Header header
                 = insert(makeRequestData(requestDTO.getCategory(), requestDTO.getTitle(), file.getName()));
 
         //avi 파일 삭제
-        fileDelete(requestDTO.getName(), requestDTO.getCategory());
+        fileUtils.delete(requestDTO.getCategory(),requestDTO.getName());
 
         if (header.getDescription().equals("SUCCESS")) {
             historySave(history,EncodingResult.OK);
@@ -86,7 +89,7 @@ public class EncodingService {
         }
 
         //메타데이터 등록 실패 시
-        fileDelete(file.getName(), requestDTO.getCategory());
+        fileUtils.delete(requestDTO.getCategory(),file.getName());
         historySave(history,EncodingResult.SAVE_META_DATA_FAIL);
         return EncodingResult.SAVE_META_DATA_FAIL;
     }
@@ -95,14 +98,6 @@ public class EncodingService {
         history.setEndAt(LocalDateTime.now());
         history.setEncodingResult(result);
         return encodingHistoryService.save(history);
-    }
-
-    //파일을 가져온다.
-    public File getFile(String category, String source) {
-        File file = new File(HOME_PATH + "\\" + category + "\\" + source);
-        if (!file.exists())
-            return null;
-        return file;
     }
 
     /**
@@ -119,19 +114,6 @@ public class EncodingService {
         // TODO: 2020-02-12 확장자 검사 
         return true;
     }
-
-    /**
-     * 파일의 확장자를 제외한 이름을 리턴한다.
-     *
-     * @param file 파일
-     * @return 전체 경로를 포함한 파일의 순수 이름
-     * @date 2020.02.09
-     * @author kimjongmo
-     */
-    public String removeExt(File file) {
-        return file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf("."));
-    }
-
 
     /**
      * VideoInsertRequest 객체를 만든다.
@@ -170,21 +152,6 @@ public class EncodingService {
             log.info("[FileUploadService] error = {}", ex);
             return Header.ERROR("알 수 없는 오류...");
         }
-    }
-
-    /**
-     * 카테고리에 존재하는 파일을 삭제한다.
-     *
-     * @param name     제거할 파일의 이름
-     * @param category 제거할 파일의 카테고리
-     * @return <code>true</code> 삭제; <code>false</code> 삭제 실패
-     */
-    public boolean fileDelete(String name, String category) {
-        File file = new File(HOME_PATH + "/" + category + "/" + name);
-        if (file.exists()) {
-            return file.delete();
-        }
-        return true;
     }
 
     /**

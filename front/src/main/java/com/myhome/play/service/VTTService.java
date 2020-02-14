@@ -3,6 +3,7 @@ package com.myhome.play.service;
 import com.myhome.play.components.MyResourceHttpRequestHandler;
 import com.myhome.play.model.entity.Video;
 import com.myhome.play.repo.VideoRepository;
+import com.myhome.play.utils.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,9 @@ public class VTTService {
     public String HOME_PATH = "D:\\MyHomeVideo";
 
     @Autowired
+    private FileUtils fileUtils;
+
+    @Autowired
     private VideoRepository videoRepository;
     @Autowired
     private MyResourceHttpRequestHandler handler;
@@ -32,9 +36,10 @@ public class VTTService {
         Video video = optionalVideo.get();
 
         String vttName = video.getFileName().replaceAll(".mp4",".vtt");
-        File file = new File(HOME_PATH + "/" + video.getCategory().getDirectoryPath() + "/" + vttName);
+        File file = fileUtils.getFile(video.getCategory().getName(),vttName);
         if(!file.exists())
             return;
+
         req.setAttribute("file", file);
         handler.handleRequest(req, res);
     }
