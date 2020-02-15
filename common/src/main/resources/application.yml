@@ -1,5 +1,3 @@
-home:
-  path: D:/MyHomeVideo
 ---
 spring:
   profiles: test

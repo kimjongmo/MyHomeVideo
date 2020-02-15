@@ -98,7 +98,7 @@ public class VideoApiService {
         Video video = optionalVideo.get();
 
         File file = fileUtils.getFile(video.getCategory().getName(), video.getFileName());
-        if (file.exists()) {
+        if (!file.exists()) {
             insertScript(res);
             return;
         }
