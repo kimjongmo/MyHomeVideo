@@ -43,15 +43,20 @@ public class PageApiService {
                 .queryParam("category", videoListRequest.getCategory())
                 .queryParam("page", videoListRequest.getPage())
                 .encode().build().toUri();
-        try {
-            Header<List<VideoListResponse>> response = restTemplateService.exchange(uri, HttpMethod.GET, null, videoListResponseType);
-            return response;
-        }catch (ResourceAccessException e){
-            return Header.ERROR("API 서버와 연결이 되지 않습니다.");
-        }catch(Exception ex){
-            log.error("[PageApiService][getContents] request = {}, error = {}",videoListRequest, ex.getMessage());
-            return Header.ERROR("알 수 없는 오류...");
+        int retry = 3;
+        while(retry-- > 0){
+            try {
+                Header<List<VideoListResponse>> response = restTemplateService.exchange(uri, HttpMethod.GET, null, videoListResponseType);
+                return response;
+            }catch (ResourceAccessException e){
+                log.error("API 서버 연결 실패...");
+            }catch(Exception ex){
+                log.error("[PageApiService][getContents] request = {}, error = {}",videoListRequest, ex.getMessage());
+                return Header.ERROR("알 수 없는 오류...");
+            }
         }
+        return Header.ERROR("API 서버와 연결이 되지 않습니다.");
+
     }
 
     public Header<List<CategoryListResponse>> getCategoryList() {
@@ -65,15 +70,19 @@ public class PageApiService {
                 = new ParameterizedTypeReference<Header<List<CategoryListResponse>>>() {
         };
 
-        try {
-            Header<List<CategoryListResponse>> response = restTemplateService.exchange(uri, HttpMethod.GET, null, type);
-            return response;
-        } catch (ResourceAccessException e) {
-            return Header.ERROR("API 서버와 연결이 되지 않습니다.");
-        } catch (Exception ex){
-            log.info("[PageApiService][getCategoryList] error = {}",ex);
-            return Header.ERROR("알 수 없는 오류...");
+        int retry = 3;
+        while(retry-- >0){
+            try {
+                Header<List<CategoryListResponse>> response = restTemplateService.exchange(uri, HttpMethod.GET, null, type);
+                return response;
+            } catch (ResourceAccessException e) {
+                log.error("API 서버 연결 실패...");
+            } catch (Exception ex){
+                log.info("[PageApiService][getCategoryList] error = {}",ex);
+                return Header.ERROR("알 수 없는 오류...");
+            }
         }
+        return Header.ERROR("API 서버와 연결이 되지 않습니다.");
     }
 
     public Header<List<VideoListResponse>> getRecentVideo(String category) {
@@ -84,14 +93,18 @@ public class PageApiService {
                 .queryParam("category", category)
                 .encode().build().toUri();
 
-        try {
-            Header<List<VideoListResponse>> response = restTemplateService.exchange(uri, HttpMethod.GET, null, videoListResponseType);
-            return response;
-        }catch (ResourceAccessException e){
-            return Header.ERROR("API 서버와 연결이 되지 않습니다.");
-        }catch(Exception ex){
-            log.error("[PageApiService][getContents] request = {}, error = {}",category, ex.getMessage());
-            return Header.ERROR("알 수 없는 오류...");
+        int retry = 3;
+        while(retry-- >0){
+            try {
+                Header<List<VideoListResponse>> response = restTemplateService.exchange(uri, HttpMethod.GET, null, videoListResponseType);
+                return response;
+            }catch (ResourceAccessException e){
+                log.error("API 서버 연결 실패...");
+            }catch(Exception ex){
+                log.error("[PageApiService][getContents] request = {}, error = {}",category, ex.getMessage());
+                return Header.ERROR("알 수 없는 오류...");
+            }
         }
+        return Header.ERROR("API 서버와 연결이 되지 않습니다.");
     }
 }

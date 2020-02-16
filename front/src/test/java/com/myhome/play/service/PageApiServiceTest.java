@@ -100,4 +100,23 @@ public class PageApiServiceTest {
         assertTrue(response.getData().size()==5);
         assertTrue(response.getData().get(3).getTitle().equals("런닝맨3"));
     }
+
+    @Test
+    public void retry_3time_test(){
+        //INPUT
+        VideoListRequest request = VideoListRequest.builder()
+                .category("테스트")
+                .page(2)
+                .build();
+
+        //GIVEN
+        given(restTemplateService.exchange(any(),any(),any(),any())).willThrow(new ResourceAccessException(""));
+
+        //WHEN
+        Header header = pageApiService.getContents(request);
+
+        //THEN
+        assertEquals(header.getStatus(),"ERROR");
+        assertTrue(header.getDescription().contains("연결"));
+    }
 }

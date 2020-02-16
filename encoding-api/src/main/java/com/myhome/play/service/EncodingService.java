@@ -54,7 +54,7 @@ public class EncodingService {
         File file = fileUtils.getFile(requestDTO.getCategory(), requestDTO.getName());
 
         //file is not existed
-        if(!file.exists()) return EncodingResult.INPUT_ERROR;
+        if (!file.exists()) return EncodingResult.INPUT_ERROR;
 
         //인코딩 히스토리
         EncodingHistory history = EncodingHistory.builder()
@@ -64,14 +64,14 @@ public class EncodingService {
                 .build();
 
         String sourcePath = file.getAbsolutePath();//인코딩할 파일의 절대경로
-        String targetPath = fileUtils.getPureName(file.getAbsolutePath())+ ".mp4"; //인코딩 된 파일의 목적 경로
+        String targetPath = fileUtils.getPureName(file.getAbsolutePath()) + ".mp4"; //인코딩 된 파일의 목적 경로
 
         //비디오 인코딩
         boolean isSuccess = encodingVideo(sourcePath, targetPath);
 
 
         if (!isSuccess) {
-            historySave(history,EncodingResult.ERROR);
+            historySave(history, EncodingResult.ERROR);
             return EncodingResult.ERROR;
         }
 
@@ -81,20 +81,20 @@ public class EncodingService {
                 = insert(makeRequestData(requestDTO.getCategory(), requestDTO.getTitle(), file.getName()));
 
         //avi 파일 삭제
-        fileUtils.delete(requestDTO.getCategory(),requestDTO.getName());
+        fileUtils.delete(requestDTO.getCategory(), requestDTO.getName());
 
         if (header.getDescription().equals("SUCCESS")) {
-            historySave(history,EncodingResult.OK);
+            historySave(history, EncodingResult.OK);
             return EncodingResult.OK;
         }
 
         //메타데이터 등록 실패 시
-        fileUtils.delete(requestDTO.getCategory(),file.getName());
-        historySave(history,EncodingResult.SAVE_META_DATA_FAIL);
+        fileUtils.delete(requestDTO.getCategory(), file.getName());
+        historySave(history, EncodingResult.SAVE_META_DATA_FAIL);
         return EncodingResult.SAVE_META_DATA_FAIL;
     }
 
-    public EncodingHistory historySave(EncodingHistory history, EncodingResult result){
+    public EncodingHistory historySave(EncodingHistory history, EncodingResult result) {
         history.setEndAt(LocalDateTime.now());
         history.setEncodingResult(result);
         return encodingHistoryService.save(history);
@@ -144,14 +144,20 @@ public class EncodingService {
         ParameterizedTypeReference<Header> type = new ParameterizedTypeReference<Header>() {
         };
 
-        try {
-            return restTemplateService.exchange(uri, HttpMethod.POST, request, type);
-        } catch (ResourceAccessException e) {
-            return Header.ERROR("VIDEO 서버와 연결이 되지 않습니다.");
-        } catch (Exception ex) {
-            log.info("[FileUploadService] error = {}", ex);
-            return Header.ERROR("알 수 없는 오류...");
+        int retry = 3;
+        while (retry-- > 0) {
+            try {
+                Header header = restTemplateService.exchange(uri, HttpMethod.POST, request, type);
+                return header;
+            } catch (ResourceAccessException e) {
+                log.error("VIDEO 서버 연결 실패...");
+            } catch (Exception ex) {
+                log.info("[FileUploadService] error = {}", ex);
+                return Header.ERROR("알 수 없는 오류...");
+            }
         }
+        return Header.ERROR("VIDEO 서버와 연결이 되지 않습니다.");
+
     }
 
     /**

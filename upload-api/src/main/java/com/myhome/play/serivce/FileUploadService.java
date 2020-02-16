@@ -72,8 +72,12 @@ public class FileUploadService {
 
                 //확장자가 avi인 경우 인코딩 서버에 요청
                 if (ext.equals("avi")) {
+                    boolean isSend = messageProducerService.sendTo(categoryName, file.getOriginalFilename(), titles.get(i));
+                    if(!isSend) {
+                        fail.append("\n인코딩 서버와 연결이 되지 않았습니다.");
+                        continue;
+                    }
                     success.append("\n" + file.getOriginalFilename() + "가 등록되었습니다.");
-                    messageProducerService.sendTo(categoryName, file.getOriginalFilename(), titles.get(i));
                     continue;
                 }
 

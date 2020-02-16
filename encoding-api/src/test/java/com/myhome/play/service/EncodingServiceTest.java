@@ -4,6 +4,7 @@ package com.myhome.play.service;
 import com.myhome.play.enums.EncodingResult;
 import com.myhome.play.model.network.Header;
 import com.myhome.play.model.network.request.encode.EncodeRequestDTO;
+import com.myhome.play.model.network.request.video.VideoInsertRequest;
 import com.myhome.play.utils.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.client.ResourceAccessException;
 
 import java.io.File;
 
@@ -148,6 +150,26 @@ public class EncodingServiceTest {
         verify(fileUtils).delete(eq("TEST"),eq("테스트.avi"));
         verify(fileUtils).delete(eq("TEST"),eq("테스트.mp4"));
         verify(encodingHistoryService).save(any());
+    }
+
+    @Test
+    //video 서버 연결 실패시 3번 시도하는가
+    public void video_connect_fail_test(){
+        //INPUT
+        VideoInsertRequest request = new VideoInsertRequest();
+        request.setFileName("파일 이름.mp4");
+        request.setCategoryName("카테고리");
+        request.setTitle("제목");
+
+        //GIVEN
+        given(restTemplateService.exchange(any(),eq(HttpMethod.POST),any(),any())).willThrow(new ResourceAccessException(""));
+
+        //WHEN
+        Header header = encodingService.insert(request);
+
+        //THEN
+        assertEquals(header.getStatus(),"ERROR");
+        assertTrue(header.getDescription().contains("연결"));
     }
 
 }
