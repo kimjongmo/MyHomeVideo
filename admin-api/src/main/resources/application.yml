@@ -1,0 +1,27 @@
+spring:
+  ## JPA ##
+  jpa:
+    hibernate:
+      ddl-auto: update
+  ## DATASOURCE ##
+  datasource:
+    url: jdbc:h2:~/data/video;AUTO_SERVER=true
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  ## JSON ##
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+  ## H2-CONSOLE ##
+  h2:
+    console:
+      enabled: true
+
+
+### LOCAL FILE PATH ###
+home:
+  path: D:/MyHomeVideo
+
+### SERVER PORT ###
+server:
+  port: 8081

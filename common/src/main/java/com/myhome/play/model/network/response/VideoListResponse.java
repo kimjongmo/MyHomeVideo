@@ -1,6 +1,7 @@
 package com.myhome.play.model.network.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.myhome.play.model.entity.Video;
 import lombok.*;
 
 @Getter
@@ -20,4 +21,14 @@ public class VideoListResponse {
     private Long view;
     @JsonProperty("description")
     private String description;
+
+    public static VideoListResponse of(Video video){
+        return VideoListResponse.builder()
+                .id(video.getId())
+                .title(video.getTitle())
+                .thumbnailUrl(video.getImgUrl())
+                .view(video.getViews())
+                .description(video.getFileName())
+                .build();
+    }
 }

@@ -4,4 +4,5 @@ include 'common'
 include 'front'
 include 'upload-api'
 include 'encoding-api'
+include 'admin-api'
 
