@@ -161,6 +161,4 @@ public class VideoApiServiceTest {
         assertEquals(result.getData().getViews(), Long.valueOf(1L));
     }
 
-    // TODO: 2020-01-09 최근 등록 메서드 테스트 추가하기
-
 }

@@ -74,17 +74,15 @@ public class VideoApiService {
                             .map(this::response)
                             .collect(Collectors.toList())
             );
-        } else {
-            Optional<Category> optionalCategory = categoryRepository.findByName(categoryName);
-            if (optionalCategory.isPresent()) {
-                Category category = optionalCategory.get();
-                return Header.OK(videoRepository.findTop5ByCategoryOrderByCreatedAtDesc(category)
-                        .stream().map(this::response).collect(Collectors.toList()));
-            }
-            throw new CategoryNotFoundException(categoryName);
         }
 
-
+        Optional<Category> optionalCategory = categoryRepository.findByName(categoryName);
+        if (optionalCategory.isPresent()) {
+            Category category = optionalCategory.get();
+            return Header.OK(videoRepository.findTop5ByCategoryOrderByCreatedAtDesc(category)
+                    .stream().map(this::response).collect(Collectors.toList()));
+        }
+        throw new CategoryNotFoundException(categoryName);
     }
 
     public void play(HttpServletRequest req, HttpServletResponse res, Long id) throws ServletException, IOException {
@@ -127,7 +125,7 @@ public class VideoApiService {
 
         // TODO: 2020-02-04 썸네일 생성을 비동기로 생성하는 방식으로 바꾸기
         boolean result = thumbnailService.create(fileUtils.getFile(data.getCategoryName(), data.getFileName()));
-        log.info("{} 썸네일 생성 : {}",video.getFileName(),result);
+        log.info("{} 썸네일 생성 : {}", video.getFileName(), result);
         return videoRepository.save(video);
     }
 
