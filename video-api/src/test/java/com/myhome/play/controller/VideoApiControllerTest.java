@@ -10,6 +10,7 @@ import com.myhome.play.model.network.response.video.VideoInfoResponse;
 import com.myhome.play.service.ThumbnailService;
 import com.myhome.play.service.VideoApiService;
 import com.myhome.play.utils.JsonMapper;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +25,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.core.StringContains.containsString;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -63,6 +65,7 @@ public class VideoApiControllerTest {
     }
 
     @Test
+    //category 없이 검색을 하려고 할 때
     public void get_list_with_request_no_category() throws Exception {
         mvc.perform(get("/video?page=1")
                 .contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -71,6 +74,7 @@ public class VideoApiControllerTest {
     }
 
     @Test
+    //page 없이 요청을 보내면 디폴트 설정(page=0)으로 잘 동작하는지
     public void get_list_with_request_no_page() throws Exception {
         List<VideoListResponse> list = new ArrayList<>();
 
@@ -83,6 +87,7 @@ public class VideoApiControllerTest {
     }
 
     @Test
+    //데이터 검색 테스트
     public void get_info_with_valid_request() throws Exception {
         Long id = 1L;
         given(videoApiService.getInfo(id)).willReturn(Header.OK(VideoInfoResponse.builder().id(1L).build()));
@@ -94,6 +99,7 @@ public class VideoApiControllerTest {
     }
 
     @Test
+    //존재하지 않는 데이터를 검색하려고 할 때
     public void get_info_with_invalid_request() throws Exception {
         Long id = 1L;
 
@@ -107,11 +113,7 @@ public class VideoApiControllerTest {
     }
 
     @Test
-    public void get_info_with_valid_multi_request() {
-
-    }
-
-    @Test
+    // 확장자가 avi 인것도 가능한지
     public void input_video_extension_avi() throws Exception {
 
         VideoInsertRequest request = new VideoInsertRequest();
@@ -128,41 +130,9 @@ public class VideoApiControllerTest {
                 .andExpect(content().string(containsString("SUCCESS")));
     }
 
-    @Test
-    public void input_video_extension_mp4() throws Exception {
-
-        VideoInsertRequest request = new VideoInsertRequest();
-        request.setTitle("제목");
-        request.setCategoryName("테스트");
-        request.setFileName("이름.mp4");
-
-        given(videoApiService.insert(any())).willReturn(Video.builder().build());
-
-        mvc.perform(post("/video")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(JsonMapper.toJson(request)))
-                .andExpect(status().isOk())
-                .andExpect(content().string(containsString("SUCCESS")));
-    }
-    @Test
-    public void insert_with_duplicate_file() throws Exception {
-        String fileName = "중복.mp4";
-        given(videoApiService.insert(any())).willThrow(new FileDuplicateException(fileName));
-
-        VideoInsertRequest request = new VideoInsertRequest();
-        request.setFileName(fileName);
-        request.setTitle("중복입니다.");
-        request.setCategoryName("카테고리");
-
-        mvc.perform(post("/video")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(JsonMapper.toJson(request)))
-                .andExpect(status().isOk())
-                .andExpect(content().string(containsString(fileName)))
-                ;
-    }
 
     @Test
+    //@valid 제대로 동작하는지 테스트
     public void input_video_title_regular_expression_test() throws Exception {
 
         VideoInsertRequest request = new VideoInsertRequest();
