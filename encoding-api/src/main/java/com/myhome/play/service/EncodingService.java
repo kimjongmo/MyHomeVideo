@@ -75,10 +75,12 @@ public class EncodingService {
             return EncodingResult.ERROR;
         }
 
-        // TODO: 2020-02-13 file.getName()하면 avi 확장자 명이 나옴. 고칠 것. 
         // VideoInsertRequest 객체를 생성 후 video 서버에 전달.
-        Header header
-                = insert(makeRequestData(requestDTO.getCategory(), requestDTO.getTitle(), file.getName()));
+        Header header = insert(
+                makeRequestData(
+                        requestDTO.getCategory(),
+                        requestDTO.getTitle(),
+                        fileUtils.getPureName(file.getName())+".mp4"));
 
         //avi 파일 삭제
         fileUtils.delete(requestDTO.getCategory(), requestDTO.getName());
@@ -123,7 +125,7 @@ public class EncodingService {
      * @param fileName     파일 이름 (확장자가 포함되어야 한다)
      * @return 인자값을 이용하여 만들어진 VideoInsertRequest 객체
      */
-    private VideoInsertRequest makeRequestData(String categoryName, String title, String fileName) {
+    public VideoInsertRequest makeRequestData(String categoryName, String title, String fileName) {
         VideoInsertRequest requestData = new VideoInsertRequest();
         requestData.setCategoryName(categoryName);
         requestData.setTitle(title);
