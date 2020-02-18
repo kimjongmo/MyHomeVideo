@@ -15,7 +15,6 @@ import java.util.List;
 public class Category extends BaseEntity{
 
     private String name;
-    private String directoryPath;
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     private List<Video> videoList;
 }
