@@ -41,7 +41,6 @@ public class CategoryService {
         file.mkdir();
         return categoryRepository.save(Category.builder()
                         .name(request.getName())
-                        .directoryPath(request.getName())
                         .build()
         );
     }

@@ -12,7 +12,6 @@ public class CategoryTest {
     public void to_string_예외_테스트(){
         Category category = Category.builder()
                 .name("카테고리")
-                .directoryPath("카테고리 패스")
                 .videoList(Arrays.asList(Video.builder().fileName("파일").build()))
                 .build();
 

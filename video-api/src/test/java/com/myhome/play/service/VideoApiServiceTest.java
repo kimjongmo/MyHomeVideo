@@ -2,11 +2,9 @@ package com.myhome.play.service;
 
 import com.myhome.play.components.MyResourceHttpRequestHandler;
 import com.myhome.play.exceptions.CategoryNotFoundException;
-import com.myhome.play.exceptions.FileDuplicateException;
 import com.myhome.play.model.entity.Category;
 import com.myhome.play.model.entity.Video;
 import com.myhome.play.model.network.Header;
-import com.myhome.play.model.network.request.video.VideoInsertRequest;
 import com.myhome.play.model.network.response.VideoListResponse;
 import com.myhome.play.model.network.response.video.VideoInfoResponse;
 import com.myhome.play.repo.CategoryRepository;
@@ -18,17 +16,13 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.util.ReflectionTestUtils;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.*;
 
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 
 public class VideoApiServiceTest {
@@ -62,7 +56,6 @@ public class VideoApiServiceTest {
     public void get_list_with_valid_request() {
         Category mockCategory = Category.builder()
                 .name("런닝맨")
-                .directoryPath("런닝맨")
                 .build();
 
         List<Video> list = Arrays.asList(
@@ -96,7 +89,6 @@ public class VideoApiServiceTest {
     public void get_list_with_valid_request_no_data() {
         Category mockCategory = Category.builder()
                 .name("런닝맨")
-                .directoryPath("런닝맨")
                 .build();
         given(categoryRepository.findByName(any()))
                 .willReturn(Optional.of(mockCategory));
