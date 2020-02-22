@@ -11,6 +11,29 @@ function modify(id) {
 }
 
 /**
+ * 썸네일 URL 에 마우스를 올리면 이미지를 보여준다.
+ * */
+function thumbImgShow(e) {
+    //이벤트 발생한 일레먼트의 x, y, 썸네일 URL
+    let x = e.clientX;
+    let y = e.clientY;
+    let imgSource = "http://localhost:8080"+$(e.target).text();
+    
+    //이미지 팝업의 display, x, y 설정
+    $('.img-popup').css("display","block");
+    $('.img-popup').css("left",x+"px");
+    $('.img-popup').css("top",y+"px");
+
+    //이미지 src 설정
+    $('.img-popup img').attr("src",imgSource);
+    
+    //OK 버튼 이벤트 설정
+    $('.img-popup span').click(function () {
+        $('.img-popup').css("display","none");
+    });
+}
+
+/**
  * 해당하는 카테고리와 페이지의 컨텐츠를 가져와, 페이지에 추가시킨다.
  * @param category 카테고리
  * @param page 가져올 페이지
@@ -29,10 +52,12 @@ function getVideoContent(category, page) {
         data: data,
         success: function (data) {
             if (data.status === 'OK') {
-                alert("성공");
                 $('#contentBody').html("");
+                //데이터를 엘리먼트로 변경 후 contentBody 이어 붙인다.
                 $('#contentBody').append(dataToContents(data.data));
+                return;
             }
+            alert(data.description);
         }
     });
 }
@@ -48,11 +73,12 @@ function getVideoContent(category, page) {
  * */
 function dataToContents(data) {
     let contents = "";
+    //data 배열에 있는 수만큼 엘리먼트를 만들어낸다.
     for (let i = 0; i < data.length; i++) {
         contents += "<tr>" +
             "<th scope=\"row\">" + data[i].id + "</th>" +
             "<td>" + data[i].title + "</td>" +
-            "<td class='col-xs-2 text-truncate' style='max-width: 200px;'>" + data[i].thumbnail_url + "</td>" +
+            "<td class='col-xs-2 text-truncate' style='max-width: 200px;'><p onclick='thumbImgShow(event)'>" + data[i].thumbnail_url + "</p></td>" +
             "<td>" + data[i].view + "</td>" +
             "<td class='col-xs-2 text-truncate' style='max-width: 200px;' title='" + data[i].description + "'>" + data[i].description + "</td>" +
             "<td>" + "2020-02-18 20:00:00" + "</td>" +
