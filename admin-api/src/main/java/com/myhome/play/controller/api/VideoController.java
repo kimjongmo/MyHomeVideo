@@ -1,4 +1,4 @@
-package com.myhome.play.controller;
+package com.myhome.play.controller.api;
 
 import com.myhome.play.model.network.Header;
 import com.myhome.play.model.network.request.video.VideoModifyRequest;

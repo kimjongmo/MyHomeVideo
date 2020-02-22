@@ -1,7 +1,7 @@
 package com.myhome.play.controller;
 
 
-import com.myhome.play.exceptions.CategoryNotFoundException;
+import com.myhome.play.controller.api.VideoController;
 import com.myhome.play.model.network.Header;
 import com.myhome.play.model.network.request.video.VideoModifyRequest;
 import com.myhome.play.model.network.response.VideoListResponse;
@@ -21,7 +21,6 @@ import java.util.Arrays;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -38,12 +37,13 @@ public class VideoControllerTest {
     @Test
     public void delete_test() throws Exception {
 
-        doNothing().when(videoApiService).delete(anyLong());
+        given(videoApiService.delete(anyLong())).willReturn(Header.MESSAGE("삭제"));
 
         mvc.perform(delete("/video/1")
                 .contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("1")))
+                .andExpect(content().string(containsString("삭제")))
+
         ;
 
         verify(videoApiService).delete(anyLong());
@@ -66,11 +66,11 @@ public class VideoControllerTest {
 
     @Test
     public void category_not_found_test() throws Exception {
-        given(videoApiService.getList(anyString(), any())).willThrow(new CategoryNotFoundException("카테고리"));
+        given(videoApiService.getList(anyString(), any())).willReturn(Header.ERROR("TEST"));
 
         mvc.perform(get("/video?category=TEST"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("카테고리")));
+                .andExpect(content().string(containsString("TEST")));
     }
 
     @Test

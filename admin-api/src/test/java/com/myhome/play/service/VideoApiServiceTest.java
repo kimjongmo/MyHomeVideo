@@ -122,7 +122,7 @@ public class VideoApiServiceTest {
         given(categoryRepository.findByName(category)).willReturn(Optional.empty());
 
         Header header = videoApiService.getList(category, pageable);
-        assertEquals(header.getData(),"ERROR");
+        assertEquals(header.getStatus(),"ERROR");
         assertTrue(header.getDescription().contains("카테고리"));
     }
 
