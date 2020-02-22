@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org/">
+
+<div th:fragment="videoList">
+    <div class="dropdown">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+            카테고리 선택
+        </button>
+        <div class="dropdown-menu">
+<!--            <a class="dropdown-item">런닝맨</a>-->
+        </div>
+    </div>
+    <table class="table">
+        <thead class="thead-dark">
+        <tr>
+            <th scope="col">번호</th>
+            <th scope="col">제목</th>
+            <th scope="col">썸네일 경로</th>
+            <th scope="col">조회수</th>
+            <th scope="col">설명</th>
+            <th scope="col">등록일</th>
+            <th scope="col">기능</th>
+        </tr>
+        </thead>
+        <tbody id="contentBody">
+        <tr>
+            <th scope="row">1</th>
+            <td>무한도전_1화</td>
+            <td>/img/thumbnail/무한도전_1화.jpg</td>
+            <td>1001</td>
+            <td>무모한 도전 - 전철과 달리기 시합</td>
+            <td>2020-02-18 20:00:00</td>
+            <td>
+                <a href="#" title="수정"><i class='far fa-edit' style='font-size:24px'></i></a>
+                <a href="#" title="삭제"><i class='far fa-trash-alt' style='font-size:24px'></i></a>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">2</th>
+            <td>무한도전_2화</td>
+            <td>/img/thumbnail/무한도전_2화.jpg</td>
+            <td>15</td>
+            <td>무모한 도전 - 목욕탕과 시합</td>
+            <td>2020-02-19 20:00:00</td>
+            <td>
+                <a href="#" title="수정"><i class='far fa-edit' style='font-size:24px'></i></a>
+                <a href="#" title="삭제"><i class='far fa-trash-alt' style='font-size:24px'></i></a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</html>
