@@ -17,19 +17,19 @@ function thumbImgShow(e) {
     //이벤트 발생한 일레먼트의 x, y, 썸네일 URL
     let x = e.clientX;
     let y = e.clientY;
-    let imgSource = "http://localhost:8080"+$(e.target).text();
-    
+    let imgSource = "http://localhost:8080" + $(e.target).text();
+
     //이미지 팝업의 display, x, y 설정
-    $('.img-popup').css("display","block");
-    $('.img-popup').css("left",x+"px");
-    $('.img-popup').css("top",y+"px");
+    $('.img-popup').css("display", "block");
+    $('.img-popup').css("left", x + "px");
+    $('.img-popup').css("top", y + "px");
 
     //이미지 src 설정
-    $('.img-popup img').attr("src",imgSource);
-    
+    $('.img-popup img').attr("src", imgSource);
+
     //OK 버튼 이벤트 설정
     $('.img-popup span').click(function () {
-        $('.img-popup').css("display","none");
+        $('.img-popup').css("display", "none");
     });
 }
 
@@ -52,9 +52,12 @@ function getVideoContent(category, page) {
         data: data,
         success: function (data) {
             if (data.status === 'OK') {
-                $('#contentBody').html("");
+                if(page === 0)
+                    $('#contentBody').html("");
                 //데이터를 엘리먼트로 변경 후 contentBody 이어 붙인다.
                 $('#contentBody').append(dataToContents(data.data));
+                //데이터 추가 버튼 추가
+                loadBtn(category,page+1);
                 return;
             }
             alert(data.description);
@@ -78,7 +81,7 @@ function dataToContents(data) {
         contents += "<tr>" +
             "<th scope=\"row\">" + data[i].id + "</th>" +
             "<td>" + data[i].title + "</td>" +
-            "<td class='col-xs-2 text-truncate' style='max-width: 200px;'><p onclick='thumbImgShow(event)'>" + data[i].thumbnail_url + "</p></td>" +
+            "<td><p class='col-xs-2 text-truncate' style='max-width: 200px;' onclick='thumbImgShow(event)'>" + data[i].thumbnail_url + "</p></td>" +
             "<td>" + data[i].view + "</td>" +
             "<td class='col-xs-2 text-truncate' style='max-width: 200px;' title='" + data[i].description + "'>" + data[i].description + "</td>" +
             "<td>" + "2020-02-18 20:00:00" + "</td>" +
@@ -89,6 +92,25 @@ function dataToContents(data) {
             "</tr>";
     }
     return contents;
+}
+
+/** 버튼 generate
+ * @param page 다음 페이지
+ * */
+function loadBtn(category, page) {
+    let btn = "<button id='loadBtn'>More Data</button>";
+
+
+
+    //버튼 유무 확인
+    if($('#loadBtn').length === 0){
+        //버튼이 없을 시 컨텐츠 테이블 아래에 추가
+        $('#contentTable').after(btn);
+    }
+    // 버튼이 있을 때에는 click 이벤트를 재설정.
+    $('#loadBtn').click(function () {
+        getVideoContent(category,page);
+    });
 }
 
 $(document).ready(function () {
