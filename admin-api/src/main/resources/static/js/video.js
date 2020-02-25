@@ -100,13 +100,14 @@ function dataToContents(data) {
 function loadBtn(category, page) {
     let btn = "<button id='loadBtn'>More Data</button>";
 
-
-
     //버튼 유무 확인
     if($('#loadBtn').length === 0){
         //버튼이 없을 시 컨텐츠 테이블 아래에 추가
         $('#contentTable').after(btn);
     }
+
+    //기존에 이벤트 해제
+    $('#loadBtn').unbind("click");
     // 버튼이 있을 때에는 click 이벤트를 재설정.
     $('#loadBtn').click(function () {
         getVideoContent(category,page);
