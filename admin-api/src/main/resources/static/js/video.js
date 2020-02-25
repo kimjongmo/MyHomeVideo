@@ -15,8 +15,8 @@ function modify(id) {
  * */
 function thumbImgShow(e) {
     //이벤트 발생한 일레먼트의 x, y, 썸네일 URL
-    let x = e.clientX;
-    let y = e.clientY;
+    let x = e.pageX;
+    let y = e.pageY;
     let imgSource = "http://localhost:8080" + $(e.target).text();
 
     //이미지 팝업의 display, x, y 설정
