@@ -1,4 +1,3 @@
-//TODO: 2020-02-22 썸네일 url 마우스를 올렸을 때 이미지 화면에 팝업 형식으로 보여주는 함수 작성하기
 //TODO: 2020-02-22 삭제 및 수정 작성하기
 
 /**
@@ -18,8 +17,8 @@ function deleteVideo(id) {
     });
 }
 
-function modify(id) {
-    alert(id + "수정합니다");
+function getVideoInfo(id) {
+    alert(id + "정보를 불러옵니다.");
 }
 
 /**
@@ -98,7 +97,7 @@ function dataToContents(data) {
             "<td class='col-xs-2 text-truncate' style='max-width: 200px;' title='" + data[i].description + "'>" + data[i].description + "</td>" +
             "<td>" + "2020-02-18 20:00:00" + "</td>" +
             "<td>" +
-            "<a href=\"javascript:void(0);\" onclick='modify(" + data[i].id + ")' title=\"수정\"><i class='far fa-edit' style='font-size:24px'></i></a>" +
+            "<a href=\"javascript:void(0);\" onclick='getVideoInfo(" + data[i].id + ")' title=\"수정\"><i class='far fa-edit' style='font-size:24px'></i></a>" +
             "<a href=\"javascript:void(0);\" onclick='deleteVideo(" + data[i].id + ")' title=\"삭제\"><i class='far fa-trash-alt' style='font-size:24px'></i></a>" +
             "</td>" +
             "</tr>";
