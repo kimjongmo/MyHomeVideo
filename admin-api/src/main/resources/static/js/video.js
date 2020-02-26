@@ -1,9 +1,21 @@
 //TODO: 2020-02-22 썸네일 url 마우스를 올렸을 때 이미지 화면에 팝업 형식으로 보여주는 함수 작성하기
 //TODO: 2020-02-22 삭제 및 수정 작성하기
 
-
-function remove(id) {
-    alert(id + '삭제합니다');
+/**
+ * 비디오를 삭제한다.
+ * */
+function deleteVideo(id) {
+    if (!confirm(id + "삭제하시겠습니까?")) {
+        return;
+    }
+    $.ajax({
+        url: '/video/' + id,
+        method: 'DELETE',
+        dataType: 'json',
+        success: function (data) {
+            alert(data.description);
+        }
+    });
 }
 
 function modify(id) {
@@ -52,12 +64,12 @@ function getVideoContent(category, page) {
         data: data,
         success: function (data) {
             if (data.status === 'OK') {
-                if(page === 0)
+                if (page === 0)
                     $('#contentBody').html("");
                 //데이터를 엘리먼트로 변경 후 contentBody 이어 붙인다.
                 $('#contentBody').append(dataToContents(data.data));
                 //데이터 추가 버튼 추가
-                loadBtn(category,page+1);
+                loadBtn(category, page + 1);
                 return;
             }
             alert(data.description);
@@ -87,21 +99,23 @@ function dataToContents(data) {
             "<td>" + "2020-02-18 20:00:00" + "</td>" +
             "<td>" +
             "<a href=\"javascript:void(0);\" onclick='modify(" + data[i].id + ")' title=\"수정\"><i class='far fa-edit' style='font-size:24px'></i></a>" +
-            "<a href=\"javascript:void(0);\" onclick='remove(" + data[i].id + ")' title=\"삭제\"><i class='far fa-trash-alt' style='font-size:24px'></i></a>" +
+            "<a href=\"javascript:void(0);\" onclick='deleteVideo(" + data[i].id + ")' title=\"삭제\"><i class='far fa-trash-alt' style='font-size:24px'></i></a>" +
             "</td>" +
             "</tr>";
     }
     return contents;
 }
 
-/** 버튼 generate
- * @param page 다음 페이지
+/**
+ * 더보기 버튼 생성 및 업데이트
+ * @param category 카테고리
+ * @param page 가져올 페이지
  * */
 function loadBtn(category, page) {
     let btn = "<button id='loadBtn'>More Data</button>";
 
     //버튼 유무 확인
-    if($('#loadBtn').length === 0){
+    if ($('#loadBtn').length === 0) {
         //버튼이 없을 시 컨텐츠 테이블 아래에 추가
         $('#contentTable').after(btn);
     }
@@ -110,7 +124,7 @@ function loadBtn(category, page) {
     $('#loadBtn').unbind("click");
     // 버튼이 있을 때에는 click 이벤트를 재설정.
     $('#loadBtn').click(function () {
-        getVideoContent(category,page);
+        getVideoContent(category, page);
     });
 }
 
