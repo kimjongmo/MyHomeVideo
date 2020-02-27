@@ -17,6 +17,7 @@ public class Video extends BaseEntity {
     private String fileName;    // 실제 파일의 이름
     private String imgUrl;      // 썸네일 url
     private Long views;         // 재생 횟수
+    private String description;
     @ManyToOne
     private Category category;  // 카테고리
 }

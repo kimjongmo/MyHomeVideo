@@ -13,14 +13,14 @@ import lombok.*;
 public class VideoModifyResponse {
     private Long id;
     private String title;
-    private String fileName;
+    private String description;
     private String imgUrl;
     private Long views;
 
     public static VideoModifyResponse of(Video video){
         VideoModifyResponse response = new VideoModifyResponse();
         response.setId(video.getId());
-        response.setFileName(video.getFileName());
+        response.setDescription(video.getDescription());
         response.setImgUrl(video.getImgUrl());
         response.setTitle(video.getTitle());
         response.setViews(video.getViews());

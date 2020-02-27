@@ -156,7 +156,7 @@ public class VideoApiService {
                 .id(video.getId())
                 .title(video.getTitle())
                 .categoryName(video.getCategory().getName())
-                .imgUrl(video.getImgUrl())
+                .thumbnailUrl(video.getImgUrl())
                 .fileName(video.getFileName())
                 .views(video.getViews())
                 .build();

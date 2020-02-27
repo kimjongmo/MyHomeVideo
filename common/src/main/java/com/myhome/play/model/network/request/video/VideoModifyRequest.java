@@ -12,7 +12,7 @@ import lombok.*;
 public class VideoModifyRequest {
     private Long id;
     private String title;
-    private String fileName;
+    private String description;
     private String imgUrl;
     private Long views;
 }

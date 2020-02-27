@@ -12,8 +12,9 @@ public class VideoInfoResponse {
     private Long id;
     private String title;
     private String fileName;
-    private String imgUrl;
+    private String thumbnailUrl;
     private Long views;
+    private String description;
     private String categoryName;
 }
 
