@@ -1,11 +1,11 @@
 package com.myhome.play.service;
 
-import com.myhome.play.exceptions.CategoryNotFoundException;
 import com.myhome.play.model.entity.Category;
 import com.myhome.play.model.entity.Video;
 import com.myhome.play.model.network.Header;
 import com.myhome.play.model.network.request.video.VideoModifyRequest;
 import com.myhome.play.model.network.response.VideoListResponse;
+import com.myhome.play.model.network.response.video.VideoInfoResponse;
 import com.myhome.play.model.network.response.video.VideoModifyResponse;
 import com.myhome.play.repo.CategoryRepository;
 import com.myhome.play.repo.VideoRepository;
@@ -130,7 +130,7 @@ public class VideoApiServiceTest {
     //비디오 메타 데이터 정보 변경 테스트
     public void modify_video_data(){
         Video beforeModify = Video.builder()
-                .fileName("변경 전 이름.avi")
+                .description("변경 전 이름.avi")
                 .imgUrl("변경전.jpg")
                 .title("파일")
                 .views(1L)
@@ -139,7 +139,7 @@ public class VideoApiServiceTest {
 
         VideoModifyRequest request = VideoModifyRequest.builder()
                 .id(1L)
-                .fileName("변경된 이름.mp4")
+                .description("변경된 이름.mp4")
                 .imgUrl("변경.jpg")
                 .title("변경된 파일입니다.")
                 .views(50L)
@@ -154,7 +154,7 @@ public class VideoApiServiceTest {
         verify(videoRepository).findById(eq(1L));
         verify(videoRepository).save(any());
         assertEquals(header.getStatus(),"OK");
-        assertEquals(header.getData().getFileName(),"변경된 이름.mp4");
+        assertEquals(header.getData().getDescription(),"변경된 이름.mp4");
         assertEquals(header.getData().getImgUrl(),"변경.jpg");
     }
 
@@ -171,7 +171,7 @@ public class VideoApiServiceTest {
 
         VideoModifyRequest request = VideoModifyRequest.builder()
                 .id(2L)
-                .fileName("변경된 이름.mp4")
+                .description("변경된 이름.mp4")
                 .imgUrl("변경.jpg")
                 .title("변경된 파일입니다.")
                 .views(50L)
@@ -185,4 +185,30 @@ public class VideoApiServiceTest {
         assertEquals(header.getDescription(),"존재하지 않는 데이터입니다.");
         assertEquals(header.getData(),null);
     }
+
+    @Test
+    //비디오 정보 조회 테스트
+    public void get_video_info_test(){
+        //INPUT
+        Long id = 1L;
+        //GIVEN
+        Video video = Video.builder()
+                .fileName("TEST.mp4")
+                .views(1L)
+                .title("TEST")
+                .imgUrl("/img/thumbnail/TEST.jpg")
+                .build();
+        video.setId(1L);
+
+        given(videoRepository.findById(id)).willReturn(Optional.of(video));
+
+        //WHEN
+        Header<VideoInfoResponse> header = videoApiService.getInfo(id);
+
+        //THEN
+        assertEquals(header.getStatus(),"OK");
+        assertEquals(header.getData().getId(),Long.valueOf(1L));
+
+    }
+
 }

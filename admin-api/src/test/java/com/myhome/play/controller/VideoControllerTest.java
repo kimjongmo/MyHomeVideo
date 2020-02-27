@@ -80,7 +80,7 @@ public class VideoControllerTest {
 
         VideoModifyRequest request = VideoModifyRequest.builder()
                 .id(2L)
-                .fileName("변경된 이름.mp4")
+                .description("변경된 이름.mp4")
                 .imgUrl("변경.jpg")
                 .title("변경된 파일입니다.")
                 .views(50L)
@@ -91,5 +91,11 @@ public class VideoControllerTest {
                 .contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
         ;
+    }
+
+    @Test
+    //비디오 정보 조회 테스트
+    public void get_video_info_test(){
+
     }
 }

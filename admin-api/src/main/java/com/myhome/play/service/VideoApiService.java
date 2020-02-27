@@ -5,6 +5,7 @@ import com.myhome.play.model.entity.Video;
 import com.myhome.play.model.network.Header;
 import com.myhome.play.model.network.request.video.VideoModifyRequest;
 import com.myhome.play.model.network.response.VideoListResponse;
+import com.myhome.play.model.network.response.video.VideoInfoResponse;
 import com.myhome.play.model.network.response.video.VideoModifyResponse;
 import com.myhome.play.repo.CategoryRepository;
 import com.myhome.play.repo.VideoRepository;
@@ -81,7 +82,7 @@ public class VideoApiService {
             return Header.ERROR("존재하지 않는 데이터입니다.");
 
         Video video = optional.get();
-        video.setFileName(request.getFileName());
+        video.setDescription(request.getDescription());
         video.setImgUrl(request.getImgUrl());
         video.setTitle(request.getTitle());
         video.setViews(request.getViews());
@@ -89,6 +90,25 @@ public class VideoApiService {
         Video saved = videoRepository.save(video);
 
         return Header.OK(VideoModifyResponse.of(saved));
+    }
+
+
+    public Header<VideoInfoResponse> getInfo(Long id){
+        Optional<Video> optionalVideo = videoRepository.findById(id);
+        if(!optionalVideo.isPresent())
+            return Header.ERROR("존재하지 않는 비디오입니다.");
+
+        Video video = optionalVideo.get();
+
+        VideoInfoResponse response = VideoInfoResponse.builder()
+                .id(video.getId())
+                .views(video.getViews())
+                .title(video.getTitle())
+                .description(video.getDescription())
+                .thumbnailUrl(video.getImgUrl())
+                .build();
+
+        return Header.OK(response);
     }
 
 }
