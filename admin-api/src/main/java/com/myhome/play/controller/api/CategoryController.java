@@ -1,5 +1,6 @@
 package com.myhome.play.controller.api;
 
+import com.myhome.play.dto.CategoryInfoResponse;
 import com.myhome.play.model.network.Header;
 import com.myhome.play.model.network.request.category.CategoryModifyRequest;
 import com.myhome.play.model.network.response.category.CategoryListResponse;
@@ -19,18 +20,23 @@ public class CategoryController {
         this.categoryApiService = categoryApiService;
     }
 
+    @GetMapping("/category/{id}")
+    public Header<CategoryInfoResponse> getInfo(@PathVariable Long id) {
+        return categoryApiService.getInfo(id);
+    }
+
     @GetMapping("/category")
     public Header<List<CategoryListResponse>> getList() {
         return Header.OK(categoryApiService.getCategoryList());
     }
 
     @PutMapping("/category")
-    public Header<CategoryModifyResponse> modify(@RequestBody @Valid CategoryModifyRequest request){
+    public Header<CategoryModifyResponse> modify(@RequestBody @Valid CategoryModifyRequest request) {
         return categoryApiService.modify(request);
     }
 
     @DeleteMapping("/category/{id}")
-    public Header delete(@PathVariable Long id){
+    public Header delete(@PathVariable Long id) {
         return categoryApiService.delete(id);
     }
 }

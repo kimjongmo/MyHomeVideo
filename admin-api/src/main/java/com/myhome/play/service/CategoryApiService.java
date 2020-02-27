@@ -1,5 +1,6 @@
 package com.myhome.play.service;
 
+import com.myhome.play.dto.CategoryInfoResponse;
 import com.myhome.play.model.entity.Category;
 import com.myhome.play.model.network.Header;
 import com.myhome.play.model.network.request.category.CategoryModifyRequest;
@@ -87,4 +88,19 @@ public class CategoryApiService {
         return Header.MESSAGE("삭제되었습니다");
     }
 
+    public Header<CategoryInfoResponse> getInfo(Long id) {
+
+        Optional<Category> optionalCategory = categoryRepository.findById(id);
+        if(!optionalCategory.isPresent())
+            return Header.ERROR("존재하지 하지 않는 카테고리입니다.");
+
+        Category category = optionalCategory.get();
+
+        CategoryInfoResponse response = CategoryInfoResponse.builder()
+                .id(category.getId())
+                .name(category.getName())
+                .build();
+
+        return Header.OK(response);
+    }
 }

@@ -1,5 +1,6 @@
 package com.myhome.play.service;
 
+import com.myhome.play.dto.CategoryInfoResponse;
 import com.myhome.play.model.entity.Category;
 import com.myhome.play.model.network.Header;
 import com.myhome.play.model.network.request.category.CategoryModifyRequest;
@@ -284,4 +285,44 @@ public class CategoryApiServiceTest {
         assertTrue(header.getDescription().contains("폴더"));
         verify(directory).listFiles();
     }
+
+
+    @Test
+    //카테고리 정보 조회 테스트
+    public void get_category_info_test(){
+        //INPUT
+        Long id = 1L;
+
+        //GIVEN
+        Category category = Category.builder().name("TEST").build();
+        category.setId(1L);
+        given(categoryRepository.findById(1L)).willReturn(Optional.of(category));
+
+        //WHEN
+        Header<CategoryInfoResponse> header = categoryApiService.getInfo(id);
+
+        //THEN
+        assertEquals(header.getStatus(),"OK");
+        assertEquals(header.getData().getId(),Long.valueOf(1L));
+        assertEquals(header.getData().getName(),"TEST");
+    }
+
+    @Test
+    //카테고리 정보 조회 실패 테스트
+    public void get_category_info_fail_test(){
+        //INPUT
+        Long id = 1L;
+
+        //GIVEN
+        given(categoryRepository.findById(1L)).willReturn(Optional.empty());
+
+        //WHEN
+        Header<CategoryInfoResponse> header = categoryApiService.getInfo(id);
+
+        //THEN
+        assertEquals(header.getStatus(),"ERROR");
+        assertEquals(header.getData(), null);
+        assertEquals(header.getDescription(),"존재하지 하지 않는 카테고리입니다.");
+    }
+
 }

@@ -1,6 +1,8 @@
 package com.myhome.play.controller;
 
 import com.myhome.play.controller.api.CategoryController;
+import com.myhome.play.dto.CategoryInfoResponse;
+import com.myhome.play.model.entity.Category;
 import com.myhome.play.model.network.Header;
 import com.myhome.play.model.network.request.category.CategoryModifyRequest;
 import com.myhome.play.model.network.response.category.CategoryListResponse;
@@ -82,5 +84,18 @@ public class CategoryControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("삭제")))
         ;
+    }
+
+    @Test
+    // 카테고리 상세 정보 가져오기 테스트
+    public void get_category_info_test() throws Exception {
+        given(categoryApiService.getInfo(anyLong())).willReturn(
+                Header.OK(CategoryInfoResponse.builder().id(1L).name("TEST").build()));
+
+        mvc.perform(get("/category/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("TEST")))
+        ;
+
     }
 }
